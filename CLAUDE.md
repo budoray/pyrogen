@@ -3,11 +3,15 @@
 ⚠ **`Febrile` is a THROWAWAY PROJECT NAME.** It is the merge of [[Titer]] and [[Corpus]] into one
 game, and the name is a placeholder for the mechanic it is built on (a fever is a defence that
 damages the defender). Dr. Ray renames it before it deploys; nothing below depends on the word.
-Slug `febrile`, port 9400.
+Slug `febrile`, port **9200**.
+⚠ **This said 9400 when the repo was founded, and 9400 is Continuous Yield's** — it holds a
+`registered` OPS row on that port. 9200 came free the same day when Asymptote was killed AND its
+A record removed; taking it is safe only because the DNS went first. Check `../Website/app.py`'s `OPS` table
+for the live port map before believing any number in a game document, including this one.
 
 **Not playable yet.** This repo is a founding: the two documents, the vendored drop-ins and
 `engine/`. The design record and the four founding questions are in
-[`IMPROVEMENTS.md`](IMPROVEMENTS.md) — read it before writing `app.py`.
+[`IMPROVEMENTS.md`](IMPROVEMENTS.md) — read it before writing a line of code.
 
 <!-- tenshin:platform:start -->
 **Two documents.** Global standards + future work: the SSoT
@@ -62,8 +66,8 @@ you are the regulation, and the regulation is the weapon.
 **1 · CONSERVATION, and it now spans both halves.** Corpus's first rule, extended, and it is the
 entire reason this merge exists: **a defence is paid for out of the same finite store a set-point
 draws on.** Recruiting cells to a site and holding a fever both spend substrate; substrate is
-released from a finite glycogen store; releasing it costs what release costs. **Nothing in
-`physiology.py` or `recruit.py` may create anything.** Two economies would make this Titer with a
+released from a finite glycogen store; releasing it costs what release costs. **Nothing in the
+physiology or recruitment code may create anything.** Two economies would make this Titer with a
 health bar; one economy is what makes the choice a choice.
 
 **2 · EVERY RESPONSE COSTS, SO MAXING EVERYTHING MUST LOSE.** Inherited from Corpus and now
@@ -81,7 +85,7 @@ waves is not labelled *memory* the first time it persists — it persists, the p
 kept it, and the reveal names it afterwards. The word *homeostasis* must not reach the browser
 before the player has been one; same for *pyrexia*, *clonal selection*, *autoimmunity*.
 
-**5 · SELECTION IS EARNED, AND IT MUST NOT LEARN THE PLAYER.** ⚠ `febrile/selection.py` may not
+**5 · SELECTION IS EARNED, AND IT MUST NOT LEARN THE PLAYER.** ⚠ The selection code may not
 read the board, the placements, the drives, or a difficulty tier. It samples the next wave from the
 genomes that lived through the last one and nothing else. **This is stricter than Titer's version,
 not looser**: the drives are now part of the environment a pathogen survives, so the temptation to
@@ -140,25 +144,26 @@ player cannot touch the wave while it plays. That is the structural answer to th
 **can a fast player who does not know the immunology beat a slow player who does?** Here the fast
 player has nothing to be fast at.
 
-## The gate — all must pass before a commit
-```bash
-python app.py test
-```
+## The gate — DOES NOT EXIST YET
+⚠ **There is no code here, so there is nothing to run and nothing to run it with.** Every other
+game's gate is the house one-liner over its own server module; building that is milestone 5 in the
+queue, and until it exists this section is the only honest thing that can stand here. The gate and
+the dev-server command land in this file on the commit that creates them — see the queue for both.
 
-## Run
-```bash
-TENSHIN_DEV=1 python app.py     # http://127.0.0.1:9400/?_acct=1  (no login in dev)
-```
+⚠ **The module layout lives in the queue, not here.** A harness-loaded file that names a module
+which does not exist sends a session looking for it, and the site's `check` fails on exactly that —
+which is how this section came to be written. Rules go here; the plan goes in the design record.
+Move a path up into this file on the commit that creates it.
 
 ## Conventions
 - ⚠ **`TENSHIN_DEV` must be set BEFORE `import tenshin_gate`** — read into a module constant at import.
 - Tenshin drop-ins are copied **verbatim** — never fork them here. So is `engine/` (from Vested).
 - A pathogen, trait, defence, insult, set-point or reveal is **data**, never code
   (`febrile/data/*.yaml`). Adding one must cost a data file.
-- ⚠ **`febrile/catalog.py` is the ONE loader**, and the only place assertions about what is IN the
-  data live. Every assertion there must be breakable by editing a real data file — `assert
-  len(TRAITS) > 0` is worse than nothing, because it makes the gate look like it checks content
-  while it checks that a file parsed.
+- ⚠ **ONE loader owns the data**, and it is the only place assertions about what is IN the data
+  live. Every assertion there must be breakable by editing a real data file — an
+  `assert len(TRAITS) > 0` is worse than nothing, because it makes the gate look like it checks
+  content while it checks that a file parsed.
 - ⚠ **Reveals ship earned-only**, in `view.codex`, and the gate asserts the vocabulary is absent
   from a fresh session's payload.
 - ⚠ **The client is ONE file for both surfaces** (`web/console.html`), switched by the body class

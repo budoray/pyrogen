@@ -1,6 +1,6 @@
 # Febrile — design record + queue
 
-Slug `febrile` · port 9400 · **founded 2026-07-27, not yet playable**.
+Slug `febrile` · port 9200 · **founded 2026-07-27, not yet playable**.
 Global standards live in the SSoT; this file is everything specific to this game.
 ⚠ **`Febrile` is a throwaway name** — a placeholder for the mechanic (a fever is a defence that
 damages the defender). Renaming it is a slug change; see the SSoT's deploy runbook before doing it,
