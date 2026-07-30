@@ -94,6 +94,16 @@ def account_from_cookie_header(cookie_header: str):
     return verify_token(m.value) if m else None
 
 
+def name_from_cookie_header(cookie_header: str):
+    """The Tenshin USERNAME on this session cookie, or None. A game with no login of its own
+    still knows who is playing, so a new save can be named after the account instead of
+    "Player7". Tokens issued before the name was baked in carry no `u` — treat that as None
+    and fall back to whatever the game called people before."""
+    m = _morsel(cookie_header)
+    d = _decode(m.value) if m else None
+    return (d.get("u") or None) if d else None
+
+
 def admin_from_cookie_header(cookie_header: str) -> bool:
     """True if the session cookie carries the admin flag (or in dev mode)."""
     if DEV_MODE:
