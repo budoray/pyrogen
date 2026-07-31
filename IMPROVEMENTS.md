@@ -3,30 +3,28 @@
 Slug `febrile` · port 9200 · **founded 2026-07-27, not yet playable**.
 Global standards live in the SSoT; this file is everything specific to this game.
 
-⚠⚠ **THE A RECORD IS MISSPELLED: `fabrile.tenshinarts.com` exists, `febrile` does not**
-(seen 2026-07-30). Verified by lookup: `fabrile.tenshinarts.com` → 104.131.165.79, and
-`febrile.tenshinarts.com` → NXDOMAIN. **Every repo, every registry and the `OPS` row all
-spell it `febrile` correctly — the typo lives only in DNS**, so there is nothing in code
-to fix and nothing in code that will ever reveal it. `python app.py check` cannot see a
-DNS record.
+~~⚠⚠ **THE A RECORD IS MISSPELLED: `fabrile.tenshinarts.com` exists, `febrile` does
+not.**~~ — **FIXED 2026-07-30 by Dr. Ray, both halves.** Verified by lookup against
+8.8.8.8: `febrile.tenshinarts.com` → 104.131.165.79, and `fabrile` → NXDOMAIN, so the
+stray name was **deleted** and not merely supplemented. That second half was the one
+that mattered: a name resolving to the box with no vhost does not fail fast, Caddy
+answers with whatever its default host serves, and that is how Asymptote came to
+publish a cabinet reading *sent an invalid response*.
+⚠ **1.1.1.1 was still returning NXDOMAIN at the time of writing** — TTL is 3600, so
+expect up to an hour of disagreement between resolvers. A lookup that says "not found"
+during that window is not evidence the record is wrong.
 
-**Two separate problems, and the second is the one that bites.**
-1. The name this game will be served under does not resolve, so the deploy cannot work
-   until the record is created.
-2. ⚠ **A stray name already points at the box.** With `fabrile` resolving and no vhost
-   for it, Caddy answers with whatever its default host serves — the same failure mode
-   that had Asymptote publishing a cabinet reading *sent an invalid response*. It should
-   be **deleted**, not left lying around.
+★ **The lesson, and it is the reason this entry stays after the fix:** the typo lived
+ONLY in DNS. Every repo, every registry and the `OPS` row spelled `febrile` correctly
+the whole time, so no gate could see it and none ever will — `python app.py check`
+cannot read a zone file. It was found by looking at the DNS console, which is the one
+place on this platform nothing watches.
 
-**The fix is one action in the DNS console and belongs to Dr. Ray** — local keys are
-deliberately not authorised on the Droplet, and DNS is the one thing on this platform
-done by hand with nothing watching it:
-- **delete** the A record `fabrile` → 104.131.165.79
-- **create** an A record `febrile` → 104.131.165.79
-
-⚠ **Do this before the deploy, not with it.** The port rule cuts the same way: a port is
-safe to reissue only once no name still resolves to the box in front of it, and this
-game holds 9200, which was Asymptote's.
+⚠⚠ **This now puts Febrile in G8's shape, exactly like brainstem:** the name resolves
+to the Droplet and there is no vhost, no unit, and nothing bound to 9200. Correct and
+necessary — the record has to exist before the deploy can work — but **nothing about
+this game may be published or lit on the strength of it**, and the port rule still
+holds: 9200 was Asymptote's.
 ⚠ **`Febrile` is a throwaway name** — a placeholder for the mechanic (a fever is a defence that
 damages the defender). Renaming it is a slug change; see the SSoT's deploy runbook before doing it,
 because slug == subdomain == unit == data directory == repo and a drift there deploys a game with no
