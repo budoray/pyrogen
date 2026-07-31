@@ -2,6 +2,31 @@
 
 Slug `febrile` · port 9200 · **founded 2026-07-27, not yet playable**.
 Global standards live in the SSoT; this file is everything specific to this game.
+
+⚠⚠ **THE A RECORD IS MISSPELLED: `fabrile.tenshinarts.com` exists, `febrile` does not**
+(seen 2026-07-30). Verified by lookup: `fabrile.tenshinarts.com` → 104.131.165.79, and
+`febrile.tenshinarts.com` → NXDOMAIN. **Every repo, every registry and the `OPS` row all
+spell it `febrile` correctly — the typo lives only in DNS**, so there is nothing in code
+to fix and nothing in code that will ever reveal it. `python app.py check` cannot see a
+DNS record.
+
+**Two separate problems, and the second is the one that bites.**
+1. The name this game will be served under does not resolve, so the deploy cannot work
+   until the record is created.
+2. ⚠ **A stray name already points at the box.** With `fabrile` resolving and no vhost
+   for it, Caddy answers with whatever its default host serves — the same failure mode
+   that had Asymptote publishing a cabinet reading *sent an invalid response*. It should
+   be **deleted**, not left lying around.
+
+**The fix is one action in the DNS console and belongs to Dr. Ray** — local keys are
+deliberately not authorised on the Droplet, and DNS is the one thing on this platform
+done by hand with nothing watching it:
+- **delete** the A record `fabrile` → 104.131.165.79
+- **create** an A record `febrile` → 104.131.165.79
+
+⚠ **Do this before the deploy, not with it.** The port rule cuts the same way: a port is
+safe to reissue only once no name still resolves to the box in front of it, and this
+game holds 9200, which was Asymptote's.
 ⚠ **`Febrile` is a throwaway name** — a placeholder for the mechanic (a fever is a defence that
 damages the defender). Renaming it is a slug change; see the SSoT's deploy runbook before doing it,
 because slug == subdomain == unit == data directory == repo and a drift there deploys a game with no
