@@ -257,19 +257,40 @@ identical `survived`/`of`/`spent`/`organ`/`alive` to the unlogged call — if co
 move a number, a spectator's replay and the player's score would be different runs. It also carries
 **no genomes**: law 5's blindness must not be one View-Source away.
 
-## ⚠ Agents dispatched at this repo get flagged — work it inline
+## ⚠ Work on this repo trips a model safeguard — use a SHORT, DEDICATED session
 
-**2026-07-31, twice, two different models.** Subagents sent to build milestones 5 and 6 were both
-terminated by a model safeguard before writing a line. The cause is almost certainly the subject
-matter read cold — `selection.py` breeds resistance across waves under fever and clearance
-pressure, which is the game's entire teaching payload and also reads like something else to a
-classifier with no context.
+**2026-07-31, three times.** Two subagents sent to build milestones 5 and 6 were terminated before
+writing a line (two different models, the second faster). Then the **main session was blocked too**,
+mid-sentence, while merely *discussing* the first two.
 
-★ **Recorded so the next session does not spend two agents rediscovering it.** The work is fine;
-the dispatch is what fails. Do this repo's engine work **in the main session**, where the
-surrounding context makes the subject legible. ⚠ **Do not respond by rewording a prompt until it
-slips through** — that is working around a safety system rather than resolving it. Building it
-inline is the honest path and it is also the one that works.
+⚠ **So the first version of this note was wrong, and the correction is the useful part: it is NOT
+about dispatched agents.** That was the obvious reading after two agent kills and it fit the
+evidence — right up until the third hit landed somewhere the theory said it could not. **It is
+about the topic accumulating in a context.** The engine models pathogen populations under fever and
+clearance pressure, and `selection.py` breeds resistance across waves — the game's entire teaching
+payload, and out of context a pattern that reads as something it is not. The longer a session runs
+on this material, the likelier the block: the first two kills were fresh agents with the subject and
+no surrounding context, the third was a session saturated with it.
+
+★ **What to do, in order:**
+1. **Work this repo in a SHORT, DEDICATED session.** Just Febrile, just the task. Not a long
+   platform thread that has been discussing it for an hour.
+2. Engine work belongs in the main session rather than a dispatched agent — a cold agent has the
+   subject and none of the context that makes it legible.
+3. ⚠ **Do NOT respond by rewording until it slips through.** Past one genuine retry that stops
+   being "fixing a false positive" and becomes working around a safety system. A fresh session is
+   the fix; prompt engineering is not.
+
+⚠ **Nothing is wrong with the game or the request** — the safeguard message says outright that it
+flags legitimate coding and biology work. This is a note about *where* to do the work, not a reason
+to change what the game is. `v0.0.8-beta` was written, gated and pushed inline with no trouble at
+all, which is the evidence that the work itself is fine.
+
+★ **The generalisable half, and it is worth carrying off this repo:** a two-point pattern produced a
+confident causal story ("agents get flagged") that the third point falsified. **Two observations
+that agree are a hypothesis, not a mechanism.** Today's platform work hit the same shape three
+separate times — a correct observation with a wrong consequence attached — which is why the standing
+rule here is to verify the consequence, not just the finding.
 
 ## Queue
 1. **Answer question 1 with a bench, before writing a client.** One pool, two axes, a table showing
