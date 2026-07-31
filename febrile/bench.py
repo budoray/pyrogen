@@ -20,10 +20,18 @@ import random
 import sys
 
 from febrile import catalog, physiology as phys, selection as sel
+from febrile import run
 
-BEATS = 30            # beats in one wave. Corpus's number, so the 39-damage
-                      # arithmetic in the design record stays comparable.
-FEVER_KILL = 5.2      # pathogen hp cleared per degree of fever per beat
+# ⚠⚠ THE BEAT LOOP AND ITS CONSTANTS MOVED TO `febrile/run.py` (2026-07-31) AND ARE
+# RE-EXPORTED HERE UNCHANGED. They were defined in this file when the bench was the
+# only thing that resolved a wave; the server resolves one too, and two copies of the
+# two-channel asymmetry is exactly the shape where a balance change moves one and not
+# the other — with both still printing confident numbers. The bench now measures the
+# same forty lines the player plays. ★ Re-exported rather than rewritten at each use
+# site so this file reads as it did and the tables it certifies are byte-identical;
+# `metrics/founding-questions.txt` is the regression test for that claim.
+BEATS = run.BEATS
+FEVER_KILL = run.FEVER_KILL
 
 # ⚠ WHAT AN UNANSWERED PATHOGEN DOES TO THE BODY, and these three numbers are
 # HARNESS, not game. The first version coupled the oxygen stressor to total hp
@@ -36,9 +44,9 @@ FEVER_KILL = 5.2      # pathogen hp cleared per degree of fever per beat
 # Scaled per individual rather than per hp, and sized against a control that is
 # now asserted: an unanswered wave 1 must hurt the body WITHOUT killing it. If
 # doing nothing is already fatal there is no room for an answer to be better.
-LOAD_O2 = 0.03        # oxygen the fight costs, per living individual per beat
-LOAD_GLU = 0.004      # glucose the fight costs, per living individual per beat
-ORGAN_PER_HEAD = 0.012  # damage per living individual per beat, unanswered
+LOAD_O2 = run.LOAD_O2        # oxygen the fight costs, per living individual per beat
+LOAD_GLU = run.LOAD_GLU      # glucose the fight costs, per living individual per beat
+ORGAN_PER_HEAD = run.ORGAN_PER_HEAD  # damage per living individual per beat, unanswered
 
 # The policies. A policy is a function (body) -> drives: it may react to the body,
 # never to the wave — the player cannot see genomes either.
@@ -68,56 +76,19 @@ POLICIES = {
 
 
 def resolve(wave, policy, seed=0):
-    """One wave, one policy. Returns what it cost and what it bought.
+    """One wave, one policy — `febrile.run.resolve`, which the SERVER also calls.
 
     ⚠ The pathogen is damaged by two SEPARATE channels with different reach:
     fever touches every individual at once and is blunted per-genome by `heat`;
     recruitment is a fixed clearance pool spent on whoever is in front and is
     blunted per-genome by `clear`. That asymmetry IS the merge — collapse them
     into one number and there is nothing to choose between.
+
+    ⚠ `seed` is accepted and unused, as it always was: the resolution is
+    deterministic given the wave and the policy. It stays in the signature because
+    callers pass it positionally and removing it would be a silent argument shift.
     """
-    b = phys.new_body()
-    living = [dict(p) for p in wave]
-    start_glycogen = b["glycogen"]
-    for _beat in range(BEATS):
-        heads = sum(1 for p in living if p["hp"] > 0)
-        _ev, clearance = phys.step(b, policy(b),
-                                   {"o2": LOAD_O2 * heads, "glu": LOAD_GLU * heads,
-                                    "load": ORGAN_PER_HEAD * heads})
-        if not phys.alive(b):
-            break
-
-        # systemic: reaches everyone, blunted per genome
-        deg = phys.fever_over(b)
-        if deg > 0:
-            for p in living:
-                if p["hp"] > 0:
-                    p["hp"] -= FEVER_KILL * deg * catalog.stat(p["traits"], "heat")
-
-        # local: a finite pool spent front-to-back, blunted per genome
-        pool = clearance
-        for p in living:
-            if pool <= 0:
-                break
-            if p["hp"] <= 0:
-                continue
-            eff = catalog.stat(p["traits"], "clear")
-            if eff <= 0:
-                continue
-            spend = min(pool, p["hp"] / eff)
-            p["hp"] -= spend * eff
-            pool -= spend
-
-    for p in living:
-        p["survived"] = p["hp"] > 0
-    return {
-        "survived": sum(1 for p in living if p["survived"]),
-        "of": len(living),
-        "spent": round(start_glycogen - b["glycogen"], 2),
-        "organ": round(b["organ"], 2),
-        "alive": phys.alive(b),
-        "individuals": living,
-    }
+    return run.resolve(wave, policy)
 
 
 def q1_table(waves=8, seed=11):

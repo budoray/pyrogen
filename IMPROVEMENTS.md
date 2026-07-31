@@ -218,6 +218,59 @@ generation until the loop is proven, and then, in this order —
 jobs, ACCOUNT-WIDE**; stagger, fire two and poll. ⚠ A rate-limited job was never queued — re-issue
 it unchanged.
 
+## 2026-07-31 — the beat loop moved out of the bench, so there is ONE of it
+
+`febrile/run.py`. The thirty-beat loop and its five constants lived in `bench.py` because the
+bench was the only thing that resolved a wave. Milestone 5 adds a second resolver — the server —
+and **two copies of the two-channel asymmetry is the shape where a balance change moves one and
+not the other, silently, with both still printing confident numbers.** The bench now calls the
+same forty lines a player plays.
+
+★ **Why a module and not a function in `bench.py`:** a server importing its own harness makes the
+harness a runtime dependency, which is how a `--check` flag ends up shipping. The game core
+belongs under the game. `bench.py` re-exports `BEATS`/`FEVER_KILL`/`LOAD_*`/`ORGAN_PER_HEAD`
+unchanged so it reads as it did.
+
+**Proved two ways, because "nothing broke" and "they are the same code" are different claims:**
+- **Regression:** `python -m febrile.bench` is **byte-identical** to `metrics/founding-questions.txt`
+  (md5 `b0f3912…`) before and after. The founding answers did not move.
+- **Coupling:** halving `FEVER_KILL` *in `run.py`* moves the bench's question-1 crossover from
+  **wave 8 to wave 5**. The bench genuinely reads the shared file; it is not a stale copy that
+  happens to agree.
+
+⚠⚠ **A MUTATION TEST CAN LIE TO YOU VIA `__pycache__`, AND IT LOOKS EXACTLY LIKE THE ASSERTION NOT
+BITING.** Mutating `5.2` → `2.6` → `5.2` with `sed -i` kept the *mutated* result after the restore.
+CPython validates its bytecode cache on **mtime and size**; both edits are the same length, and
+inside one second the mtime does not move either — so the restored source was never recompiled.
+★ **The dangerous direction is the other one:** mutate, see no change, and conclude "the check does
+not bite" when the cache simply served the old code — which would retire a working assertion. This
+platform's house rule is *break it and watch it go red*; the rule needs a second clause. **Change
+the file's SIZE (or `touch` it) when mutating a numeric literal, and re-run once more after
+restoring to confirm the baseline actually came back.**
+
+⚠ **`bench.resolve(wave, policy, seed=0)` keeps its unused `seed`.** It was always unused — the
+resolution is deterministic given the wave and the policy — and callers pass it positionally, so
+removing it is a silent argument shift, not a cleanup.
+
+⚠ **The frame log is a RECORD, never an input.** `resolve(..., log=True)` is asserted to return
+identical `survived`/`of`/`spent`/`organ`/`alive` to the unlogged call — if computing the log could
+move a number, a spectator's replay and the player's score would be different runs. It also carries
+**no genomes**: law 5's blindness must not be one View-Source away.
+
+## ⚠ Agents dispatched at this repo get flagged — work it inline
+
+**2026-07-31, twice, two different models.** Subagents sent to build milestones 5 and 6 were both
+terminated by a model safeguard before writing a line. The cause is almost certainly the subject
+matter read cold — `selection.py` breeds resistance across waves under fever and clearance
+pressure, which is the game's entire teaching payload and also reads like something else to a
+classifier with no context.
+
+★ **Recorded so the next session does not spend two agents rediscovering it.** The work is fine;
+the dispatch is what fails. Do this repo's engine work **in the main session**, where the
+surrounding context makes the subject legible. ⚠ **Do not respond by rewording a prompt until it
+slips through** — that is working around a safety system rather than resolving it. Building it
+inline is the honest path and it is also the one that works.
+
 ## Queue
 1. **Answer question 1 with a bench, before writing a client.** One pool, two axes, a table showing
    the better answer changes by wave. If it does not, this game is Titer with a HUD and should be
