@@ -1,0 +1,32 @@
+QUESTION 1 -- the same wave, answered two ways
+wave  heat%  caps% | sys left  spent | loc left  spent | better
+   1     0%     0% |        0    8.0 |        0   55.9 | systemic
+   2     0%     0% |        0    7.3 |        0   52.9 | systemic
+   3     0%     0% |        0    7.3 |        3   43.9 | systemic
+   4    10%     0% |        2    7.3 |        5   43.1 | systemic
+   5    64%     0% |        8    6.6 |        9   40.1 | systemic
+   6    93%     0% |       12    6.6 |       12   36.4 | systemic
+   7    97%    10% |       13    6.6 |       13   36.4 | systemic
+   8    97%    15% |       17    6.6 |       15   35.7 | local
+
+QUESTION 2 -- fever every wave vs never, independent histories
+wave | fever left  organ | local left  organ
+   1 |          0    7.0 |          0    6.2
+   2 |          0    6.6 |          1    6.2
+   3 |          0    6.8 |          4    6.5
+   4 |          0    6.9 |          6    6.2
+   5 |          0    7.1 |          9    6.6
+   6 |          1    6.2 |         12    6.2
+   7 |          5    7.0 |         15    6.7
+   8 |         13    7.3 |         15    6.0
+   9 |         20    6.7 |         18    6.3
+  10 |         22    6.9 |         21    6.8
+  11 |         23    7.0 |         22    6.4
+  12 |         25    7.2 |         24    6.6
+  13 |         27    7.4 |         26    6.3
+  14 |         28    7.5 |         27    6.8
+
+final pools -- fever run: {'capsule': 0.3929, 'fast_split': 0.75, 'heat_shock': 0.5}
+              local run: {'capsule': 0.0369, 'fast_split': 0.2212, 'heat_shock': 0.4424}
+
+febrile.bench self-check OK -- controls held (an unanswered wave lost 0 of 11, and full drive took 7 damage against 4 for doing nothing, and died); question 1 ANSWERED: the better answer flips at wave 8 and both win somewhere across 8 waves; question 2 ANSWERED: fever wins wave 1 and loses from wave 9, with heat-shock at 50% of the fever run's pool against 44% of the no-fever run's -- so the crossover was bred, not scripted

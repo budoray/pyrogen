@@ -9,7 +9,9 @@ Slug `febrile`, port **9200**.
 A record removed; taking it is safe only because the DNS went first. Check `../Website/app.py`'s `OPS` table
 for the live port map before believing any number in a game document, including this one.
 
-**Not playable yet.** This repo is a founding: the two documents, the vendored drop-ins and
+**Not playable yet, but no longer empty.** The engine core exists and gates: `febrile/catalog.py`,
+`febrile/selection.py`, `febrile/physiology.py` and `febrile/bench.py`. There is no server and no
+client — milestones 5 and 6 in the queue. What the repo still carries from the founding is
 `engine/`. The design record and the four founding questions are in
 [`IMPROVEMENTS.md`](IMPROVEMENTS.md) — read it before writing a line of code.
 
@@ -144,16 +146,17 @@ player cannot touch the wave while it plays. That is the structural answer to th
 **can a fast player who does not know the immunology beat a slow player who does?** Here the fast
 player has nothing to be fast at.
 
-## The gate — DOES NOT EXIST YET
-⚠ **There is no code here, so there is nothing to run and nothing to run it with.** Every other
-game's gate is the house one-liner over its own server module; building that is milestone 5 in the
-queue, and until it exists this section is the only honest thing that can stand here. The gate and
-the dev-server command land in this file on the commit that creates them — see the queue for both.
+## The gate — the engine core, not yet the house one-liner
+```bash
+python -m febrile.catalog && python -m febrile.selection   && python -m febrile.physiology && python -m febrile.bench --check
+```
+⚠ **There is still no `app.py`**, so this is not yet the house `python app.py test`. It becomes that
+on the commit that creates the server (milestone 5); until then this chain is the honest whole gate
+and it is what `../Website/app.py`'s `OPS` row names.
 
-⚠ **The module layout lives in the queue, not here.** A harness-loaded file that names a module
-which does not exist sends a session looking for it, and the site's `check` fails on exactly that —
-which is how this section came to be written. Rules go here; the plan goes in the design record.
-Move a path up into this file on the commit that creates it.
+⚠ **The bench is part of the gate**, as in Corpus — and it earns that here. It caught three separate
+errors that each printed a confident number, including a pathogen that was healing faster than it
+hurt. See the design record.
 
 ## Conventions
 - ⚠ **`TENSHIN_DEV` must be set BEFORE `import tenshin_gate`** — read into a module constant at import.

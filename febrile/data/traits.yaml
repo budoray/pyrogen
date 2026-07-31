@@ -1,0 +1,33 @@
+# The heritable traits a pathogen can carry. THIS FILE IS THE ENEMY.
+#
+# ⚠ Nothing here says "wave 9 counters the player". Every trait is a plain
+# modifier; the population ACQUIRES traits because the individuals that lived
+# through what you did got to breed. `selection.py` never sees a drive.
+#
+#   heat      — multiplier on how much a degree of fever hurts this individual.
+#               < 1.0 means fever works less well. THIS is the trait fever breeds.
+#   clear     — multiplier on how well recruited cells clear this individual.
+#               < 1.0 means the local answer works less well.
+#   hp        — multiplier on how much clearing it takes at all
+#   earliest  — the first wave this may MUTATE IN. Inheritance is never gated:
+#               a genome that carries it keeps it, spreads it, and can take the
+#               pool at any wave. Gating inheritance would make it the script
+#               this whole module exists to avoid.
+heat_shock:
+  name: heat-shock proteins
+  heat: 0.35
+  hp: 1.0
+  clear: 1.0
+  earliest: 2
+capsule:
+  name: polysaccharide capsule
+  heat: 1.0
+  hp: 1.15
+  clear: 0.45
+  earliest: 3
+fast_split:
+  name: short generation
+  heat: 1.0
+  hp: 0.8
+  clear: 1.0
+  earliest: 1
