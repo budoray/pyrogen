@@ -188,6 +188,53 @@ does not teach is a bug.
 
 ---
 
+## ⚠⚠ BLOCKING: a fever kills the body on wave 1, every time (2026-08-01)
+
+**Measured, not suspected.** The saturation trap section below says to verify before
+shipping and record the table. This is the table, eight seeds, wave 1, via
+`game.play_wave`:
+
+| schedule | body alive | wave cleared |
+|---|---|---|
+| nothing | 8/8 | 0/8 |
+| `recruit .45` | **8/8** | **8/8** |
+| `recruit .25` | 8/8 | 3/8 |
+| `hyperventilate .4` + `recruit .4` | **8/8** | **8/8** |
+| `glycogenolysis .1` alone | 8/8 | 0/8 |
+| `glycogenolysis .3` alone | **0/8** | 0/8 |
+| `recruit .45` + `glycogenolysis .3` | **0/8** | 8/8 |
+| fever trigger (`temp < 38.5 → shiver .7`) alone | **0/8** | 8/8 |
+| fever trigger + `recruit .45` | **0/8** | 8/8 |
+| fever trigger + `recruit .45` + `hyperventilate .4` | **0/8** | 8/8 |
+
+★ **Two findings, and the second is the one that blocks a deploy.**
+
+**1 · `glycogenolysis .3` is lethal on its own** — it kills the body while clearing
+nothing. Releasing sugar should be a cost, not a suicide; at `.1` it is survivable, so
+the lethal edge is somewhere between and it is very steep.
+
+**2 · EVERY schedule that raises a fever dies on wave 1** — in all three combinations
+tried, including with hyperventilation to fund the oxygen. They all *clear the wave*
+and the body is dead at the end of it. **The signature mechanic is currently fatal.**
+
+⚠ **This contradicts the bench's answer to founding question 2**, which reports the
+fever run clearing waves 1–5. So either the bench's fever policy is expressible and I
+did not find it, or the two diverged — and `bench.py` and the player both go through
+`run.resolve`, so a divergence would be in the POLICY, not the loop. **That is the first
+thing to check, and it is cheap:** lift the bench's exact policy into a schedule and see
+whether it survives. If it does, the schedule vocabulary is missing something the bench
+can say. If it does not, question 2's answer needs re-reading.
+
+⚠ **Do NOT mark this game shipped until this resolves.** It runs, the loop is whole and
+you can play it — but a player who uses the mechanic the game is named after dies every
+time, and the OPS row saying `shipped` would be a claim that this is a game.
+
+⚠ **The bots were moved to a recruit-only policy as a WORKAROUND** (`bot_schedule` in
+`app.py`, which says so at the call site). They survive 12/12 that way. A fleet on the
+honest policy would be two corpses in the live feed forever — which monitors as a
+living world and is not one. Give them their fever back when this is fixed; a living
+world whose agents cannot use the central verb demonstrates the wrong game.
+
 ## The saturation trap — verify before shipping, and record the table
 ★ The SSoT's generalised rule: **the pressure a game claims to teach must actually bind.** This
 game can fail it in three separate places, and all three look playable:

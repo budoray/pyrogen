@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pyrogen</title>
+<style>
+  /* One file, both surfaces. The spectator rule is a BODY CLASS and a CSS rule in
+     here — never a runtime regex over the toolbar, which is what stripped another
+     game's back link while its template plainly contained it. */
+  :root{
+    --paper:#0E1014; --panel:#161A21; --panel-2:#1D222B; --ink:#E8ECF4;
+    --ink-soft:#98A2B3; --line:rgba(232,236,244,.14);
+    --acc:#96307D;            /* Corpus's hue, inherited with Corpus's port */
+    --acc-ink:#fff; --warn:#D2762A; --bad:#C4453F; --good:#3E8E6B;
+    --body:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --r:12px 12px 4px 4px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);
+       font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px;margin:0 auto;padding:1rem clamp(.75rem,3vw,2rem) 3rem}
+  h1{font-size:1.5rem;margin:0;letter-spacing:.01em}
+  h2{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;
+     color:var(--ink-soft);margin:0 0 .6rem}
+  p{margin:.4rem 0}
+  .sub{color:var(--ink-soft);font-size:.9rem;margin:.15rem 0 0}
+
+  /* house chrome: build · report · back · sign out, same set, same order */
+  .bar{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;
+       padding:.7rem 0 1rem;border-bottom:1px solid var(--line);margin-bottom:1.2rem}
+  .bar .spacer{flex:1}
+  .build{font-variant-numeric:tabular-nums;color:var(--ink-soft);font-size:.8rem;
+         letter-spacing:.08em}
+  .lnk{display:inline-flex;align-items:center;min-height:28px;padding:.28rem .7rem;
+       border:1px solid var(--line);border-radius:8px;background:transparent;
+       color:var(--ink);text-decoration:none;font:inherit;font-size:.85rem;cursor:pointer}
+  .lnk:hover{border-color:var(--ink-soft)}
+  body.spectate .hideq{display:none}
+
+  .grid{display:grid;gap:1rem;grid-template-columns:minmax(0,1fr) minmax(0,340px)}
+  @media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+  .card{background:var(--panel);border-radius:var(--r);padding:1rem;
+        border:1px solid var(--line)}
+  .card + .card{margin-top:1rem}
+
+  /* the body's read-outs */
+  .gauges{display:grid;gap:.5rem;grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+  .g{background:var(--panel-2);border-radius:8px;padding:.5rem .6rem}
+  .g .k{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .g .v{font-size:1.15rem;font-variant-numeric:tabular-nums}
+  .g.out .v{color:var(--warn)}
+  .g.bad .v{color:var(--bad)}
+
+  .track{height:6px;background:var(--panel-2);border-radius:3px;overflow:hidden;margin-top:.35rem}
+  .track i{display:block;height:100%;background:var(--acc)}
+
+  /* the schedule editor */
+  .row{display:flex;align-items:center;gap:.6rem;margin:.45rem 0}
+  .row label{flex:0 0 9.5rem;font-size:.86rem}
+  .row input[type=range]{flex:1;min-height:24px;accent-color:var(--acc)}
+  .row .n{flex:0 0 2.6rem;text-align:right;font-variant-numeric:tabular-nums;
+          color:var(--ink-soft);font-size:.85rem}
+  .trig{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:.45rem 0;
+        background:var(--panel-2);padding:.5rem;border-radius:8px}
+  .trig select,.trig input{min-height:28px;background:var(--paper);color:var(--ink);
+        border:1px solid var(--line);border-radius:6px;padding:.2rem .4rem;font:inherit;
+        font-size:.85rem}
+  .trig .w{width:5rem}
+  .go{display:inline-flex;align-items:center;min-height:36px;padding:.5rem 1.2rem;
+      border:0;border-radius:10px;background:var(--acc);color:var(--acc-ink);
+      font:inherit;font-weight:600;cursor:pointer}
+  .go:disabled{opacity:.5;cursor:default}
+  .ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
+
+  .beats{display:flex;gap:2px;align-items:flex-end;height:64px;margin-top:.5rem}
+  .beats i{flex:1;background:var(--acc);opacity:.5;border-radius:2px 2px 0 0;min-height:2px}
+  .beats i.hot{background:var(--warn);opacity:1}
+  .beats i.now{outline:2px solid var(--ink)}
+
+  .list{list-style:none;margin:.4rem 0 0;padding:0;font-size:.88rem}
+  .list li{display:flex;justify-content:space-between;gap:.6rem;padding:.25rem 0;
+           border-bottom:1px solid var(--line)}
+  .list li:last-child{border-bottom:0}
+  .muted{color:var(--ink-soft)}
+  .win{color:var(--good)} .lose{color:var(--bad)}
+  .dead{border-color:var(--bad)}
+  .note{font-size:.86rem;color:var(--ink-soft);margin-top:.5rem}
+  .err{color:var(--bad);font-size:.86rem;min-height:1.2em}
+
+  dialog{background:var(--panel);color:var(--ink);border:1px solid var(--line);
+         border-radius:var(--r);padding:1rem;max-width:26rem;width:92%}
+  dialog::backdrop{background:rgba(0,0,0,.6)}
+  dialog input,dialog textarea,dialog select{width:100%;background:var(--paper);
+         color:var(--ink);border:1px solid var(--line);border-radius:6px;
+         padding:.4rem;font:inherit;margin:.25rem 0 .6rem;min-height:28px}
+</style>
+</head>
+<body class="__BODYCLASS__">
+<div class="wrap">
+
+  <div class="bar">
+    <h1>Pyrogen</h1>
+    <span class="build">__VERSION__</span>
+    <span class="spacer"></span>
+    <button class="lnk" id="reportBtn" type="button">Report</button>
+    <a class="lnk" href="__SITE__">← Tenshin Arts</a>
+    <a class="lnk hideq" href="__SITE__/logout">Sign out</a>
+  </div>
+
+  <p class="sub" id="pitch">A pathogen is crossing tissue toward an organ, and every way
+     you have of stopping it is a way of hurting yourself.</p>
+
+  <div class="grid">
+    <div>
+      <div class="card" id="bodyCard">
+        <h2>The body</h2>
+        <div class="gauges" id="gauges"></div>
+        <div class="beats" id="beats"></div>
+        <p class="note" id="beatNote">Commit a schedule and the wave resolves over thirty beats.</p>
+      </div>
+
+      <div class="card hideq" id="editor">
+        <h2>Resting drives</h2>
+        <div id="rest"></div>
+        <h2 style="margin-top:1rem">Reflexes <span class="muted" id="trigCount"></span></h2>
+        <div id="triggers"></div>
+        <button class="lnk" id="addTrig" type="button">+ Add reflex</button>
+        <p class="err" id="err"></p>
+        <p style="margin-top:.8rem">
+          <button class="go" id="commit" type="button">Commit the wave</button>
+          <button class="go ghost" id="restart" type="button">New body</button>
+        </p>
+        <p class="note">A reflex reads the body only — never the wave. Everything is
+           committed before the first beat, so nothing here rewards reaction speed.</p>
+      </div>
+
+      <div class="card dead" id="deathCard" hidden>
+        <h2>The body failed</h2>
+        <p id="deathRoute"></p>
+        <p class="note" id="deathDetail"></p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>This run</h2>
+        <ul class="list" id="runStats"></ul>
+      </div>
+      <div class="card">
+        <h2>What bred</h2>
+        <ul class="list" id="freqs"></ul>
+        <p class="note">Survivors of each wave seed the next. What you failed to kill
+           is what comes back.</p>
+      </div>
+      <div class="card hideq" id="progressCard">
+        <h2>What you have shown</h2>
+        <ul class="list" id="progress"></ul>
+      </div>
+      <div class="card" id="agentsCard" hidden>
+        <h2>Agents</h2>
+        <ul class="list" id="agents"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<dialog id="reportDlg">
+  <h2>Report</h2>
+  <select id="rKind"><option value="bug">Bug</option><option value="idea">Idea</option></select>
+  <input id="rTitle" placeholder="One line">
+  <textarea id="rBody" rows="4" placeholder="What happened?"></textarea>
+  <p class="err" id="rMsg"></p>
+  <button class="go" id="rSend" type="button">Send</button>
+  <button class="go ghost" id="rClose" type="button">Close</button>
+</dialog>
+
+<script>
+"use strict";
+var SPECTATE = document.body.classList.contains("spectate");
+var V = null, FRAMES = [], PLAYING = 0, SCHED = {rest:{}, triggers:[]};
+var $ = function(id){ return document.getElementById(id); };
+
+function esc(s){ var d = document.createElement("div"); d.textContent = String(s); return d.innerHTML; }
+function num(x, n){ return Number(x).toFixed(n === undefined ? 2 : n); }
+
+/* ── gauges ────────────────────────────────────────────────────────────── */
+function drawGauges(f){
+  var sp = V && V.setpoints ? V.setpoints : {};
+  var vals = f ? [["temp","Core temp",f.temp,1],["spo2","Saturation",f.spo2*100,0],
+                 ["glucose","Blood sugar",f.glucose,1]] : [];
+  var html = "";
+  vals.forEach(function(r){
+    var k = r[0], band = sp[k] ? sp[k].ok : null, raw = k === "spo2" ? r[2]/100 : r[2];
+    var cls = "g";
+    if (band && (raw < band[0] || raw > band[1])) cls = "g out";
+    html += '<div class="' + cls + '"><div class="k">' + esc(r[1]) + '</div>' +
+            '<div class="v">' + num(r[2], r[3]) + (k === "spo2" ? "%" : "") + '</div></div>';
+  });
+  if (f){
+    var organCls = f.organ >= 4.5 ? "g bad" : (f.organ >= 2.5 ? "g out" : "g");
+    html += '<div class="' + organCls + '"><div class="k">Organ damage</div><div class="v">' +
+            num(f.organ) + '</div><div class="track"><i style="width:' +
+            Math.min(100, f.organ / 6 * 100) + '%"></i></div></div>';
+    html += '<div class="g"><div class="k">Glycogen</div><div class="v">' + num(f.glycogen, 0) +
+            '</div><div class="track"><i style="width:' + Math.min(100, f.glycogen) + '%"></i></div></div>';
+    html += '<div class="g"><div class="k">Still standing</div><div class="v">' + f.heads + '</div></div>';
+  }
+  $("gauges").innerHTML = html || '<p class="muted">No wave resolved yet.</p>';
+}
+
+function drawBeats(i){
+  var html = "";
+  FRAMES.forEach(function(f, n){
+    var h = Math.max(2, Math.min(100, f.hp / 3));
+    var cls = f.temp >= 38 ? "hot" : "";
+    if (n === i) cls += " now";
+    html += '<i class="' + cls.trim() + '" style="height:' + h + '%"></i>';
+  });
+  $("beats").innerHTML = html;
+}
+
+function play(){
+  if (!FRAMES.length) return;
+  PLAYING = 0;
+  var step = function(){
+    if (PLAYING >= FRAMES.length) { drawBeats(-1); return; }
+    drawGauges(FRAMES[PLAYING]);
+    drawBeats(PLAYING);
+    PLAYING++;
+    setTimeout(step, 60);
+  };
+  step();
+}
+
+/* ── the schedule editor ───────────────────────────────────────────────── */
+function drawEditor(){
+  if (SPECTATE || !V) return;
+  var r = "";
+  Object.keys(V.responses).forEach(function(k){
+    var val = SCHED.rest[k] || 0;
+    r += '<div class="row"><label for="d_' + k + '">' + esc(V.responses[k]) + '</label>' +
+         '<input type="range" id="d_' + k + '" min="0" max="1" step="0.05" value="' + val + '">' +
+         '<span class="n" id="n_' + k + '">' + num(val) + '</span></div>';
+  });
+  $("rest").innerHTML = r;
+  Object.keys(V.responses).forEach(function(k){
+    $("d_" + k).addEventListener("input", function(e){
+      SCHED.rest[k] = parseFloat(e.target.value);
+      $("n_" + k).textContent = num(e.target.value);
+    });
+  });
+
+  var t = "";
+  SCHED.triggers.forEach(function(tr, i){
+    t += '<div class="trig">if <select id="tm_' + i + '">' +
+         V.trigger_metrics.map(function(m){
+           return '<option value="' + m + '"' + (m === tr.metric ? " selected" : "") + '>' +
+                  esc((V.setpoints[m] && V.setpoints[m].name) || m) + '</option>';
+         }).join("") + '</select>' +
+         '<select id="to_' + i + '"><option value="&gt;"' + (tr.op === ">" ? " selected" : "") +
+         '>&gt;</option><option value="&lt;"' + (tr.op === "<" ? " selected" : "") +
+         '>&lt;</option></select>' +
+         '<input class="w" id="tv_' + i + '" type="number" step="0.1" value="' + tr.value + '">' +
+         ' then <select id="ts_' + i + '">' +
+         Object.keys(V.responses).map(function(k){
+           var on = Object.keys(tr.set)[0] === k;
+           return '<option value="' + k + '"' + (on ? " selected" : "") + '>' +
+                  esc(V.responses[k]) + '</option>';
+         }).join("") + '</select>' +
+         '<input class="w" id="tl_' + i + '" type="number" min="0" max="1" step="0.05" value="' +
+         (Object.values(tr.set)[0] || 0) + '">' +
+         '<button class="lnk" type="button" id="tx_' + i + '">Remove</button></div>';
+  });
+  $("triggers").innerHTML = t;
+  SCHED.triggers.forEach(function(tr, i){
+    var sync = function(){
+      tr.metric = $("tm_" + i).value;
+      tr.op = $("to_" + i).value;
+      tr.value = parseFloat($("tv_" + i).value);
+      tr.set = {}; tr.set[$("ts_" + i).value] = parseFloat($("tl_" + i).value);
+    };
+    ["tm_", "to_", "tv_", "ts_", "tl_"].forEach(function(p){
+      $(p + i).addEventListener("change", sync);
+    });
+    $("tx_" + i).addEventListener("click", function(){
+      SCHED.triggers.splice(i, 1); drawEditor();
+    });
+  });
+  $("trigCount").textContent = SCHED.triggers.length + " of " + V.max_triggers;
+  $("addTrig").disabled = SCHED.triggers.length >= V.max_triggers;
+}
+
+/* ── panels ────────────────────────────────────────────────────────────── */
+function drawRun(){
+  if (!V) return;
+  var last = V.last;
+  var rows = [["Wave", V.wave + " of " + V.max_waves], ["Waves survived", V.score],
+              ["Substrate spent", num(V.spent, 1)], ["Best run", V.best]];
+  if (last) rows.push(["Last wave", (last.cleared ? "cleared" : last.survived + " left standing")]);
+  $("runStats").innerHTML = rows.map(function(r){
+    return "<li><span>" + esc(r[0]) + '</span><span class="muted">' + esc(r[1]) + "</span></li>";
+  }).join("");
+
+  var f = V.frequencies || {};
+  var keys = Object.keys(f);
+  $("freqs").innerHTML = keys.length ? keys.map(function(k){
+    return "<li><span>" + esc((V.traits && V.traits[k]) || k) + '</span><span class="muted">' +
+           Math.round(f[k] * 100) + "%</span></li>";
+  }).join("") : '<li><span class="muted">Nothing has bred yet.</span></li>';
+
+  var dead = V.alive === false;
+  $("deathCard").hidden = !dead || !last || !last.postmortem;
+  if (dead && last && last.postmortem){
+    var pm = last.postmortem;
+    $("deathRoute").innerHTML = "<strong>" + esc(pm.route) + "</strong> — " +
+      esc(pm.setpoint_name || "no set-point") +
+      (pm.setpoint_value !== null && pm.setpoint_value !== undefined
+        ? " ran to " + esc(pm.setpoint_value) : "") + ", " + esc(pm.beats) + " beats in.";
+    $("deathDetail").textContent = pm.detail;
+  }
+}
+
+function drawProgress(p){
+  if (SPECTATE || !p) return;
+  $("progress").innerHTML = '<li><span>' + esc(p.rank) + '</span><span class="muted">level ' +
+    esc(p.level) + "</span></li>" + p.rows.map(function(r){
+      return "<li><span>" + esc(r.name) + '</span><span class="muted">' + esc(r.band) + "</span></li>";
+    }).join("");
+}
+
+function apply(d){
+  V = d.view; FRAMES = (V.last && V.last.frames) || [];
+  drawRun(); drawProgress(d.progress); drawEditor();
+  if (FRAMES.length) play(); else drawGauges(null);
+}
+
+/* ── wire ──────────────────────────────────────────────────────────────── */
+function post(url, body){
+  return fetch(url, {method:"POST", headers:{"Content-Type":"application/json"},
+                     body: JSON.stringify(body || {})})
+    .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); });
+}
+
+if (!SPECTATE){
+  $("commit").addEventListener("click", function(){
+    $("err").textContent = ""; $("commit").disabled = true;
+    post("/api/commit", {schedule: SCHED}).then(function(res){
+      $("commit").disabled = false;
+      if (!res.ok){ $("err").textContent = res.j.error || "refused"; return; }
+      apply(res.j);
+    });
+  });
+  $("restart").addEventListener("click", function(){
+    post("/api/restart").then(function(res){ if (res.ok) apply(res.j); });
+  });
+  $("addTrig").addEventListener("click", function(){
+    if (!V || SCHED.triggers.length >= V.max_triggers) return;
+    var first = Object.keys(V.responses)[0];
+    var set = {}; set[first] = 0.5;
+    SCHED.triggers.push({metric:"temp", op:"<", value:38.5, set:set});
+    drawEditor();
+  });
+  fetch("/api/state").then(function(r){ return r.json(); }).then(apply);
+}
+
+/* the report box — rsend() is what the gate looks for */
+function rsend(){
+  var meta = {wave: V ? V.wave : 0, score: V ? V.score : 0};
+  post("/api/report", {kind:$("rKind").value, title:$("rTitle").value,
+                       body:$("rBody").value, meta:meta}).then(function(res){
+    $("rMsg").textContent = res.j.ok ? "Sent — thank you." : ("Not sent: " + res.j.info);
+  });
+}
+$("reportBtn").addEventListener("click", function(){ $("reportDlg").showModal(); });
+$("rClose").addEventListener("click", function(){ $("reportDlg").close(); });
+$("rSend").addEventListener("click", rsend);
+
+/* spectator: the public feed, same renderer */
+if (SPECTATE){
+  $("agentsCard").hidden = false;
+  var paint = function(d){
+    $("agents").innerHTML = (d.agents || []).map(function(a){
+      return "<li><span>" + esc(a.name) + '</span><span class="' +
+             (a.alive ? "win" : "lose") + '">wave ' + esc(a.wave) + " · " +
+             esc(a.score) + "</span></li>";
+    }).join("") || '<li><span class="muted">No agents are playing.</span></li>';
+    if (d.featured) apply(d.featured);
+  };
+  fetch("/live/agents").then(function(r){ return r.json(); }).then(paint);
+  try {
+    var es = new EventSource("/live/stream");
+    es.onmessage = function(e){ paint(JSON.parse(e.data)); };
+  } catch (err) { /* no stream: the one-shot fetch above already painted */ }
+}
+</script>
+</body>
+</html>
