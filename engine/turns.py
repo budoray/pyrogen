@@ -92,6 +92,29 @@ class TurnEngine:
             ).fetchall()
         return [r[0] for r in rows]
 
+    def retire_bot(self, pid, cohort="default"):
+        """Remove one bot and hand back its FINAL STATE, or None if it was not a bot.
+
+        The state comes back rather than being dropped because an agent's run is the only
+        thing it was ever for: it is retired when its TTL expires, and what it did — how far
+        it got, what it scored, how long it lived — is the data the retirement exists to
+        collect. Returning it here means the caller cannot forget to read it first, which a
+        `delete_bot()` would invite every single time.
+
+        ⚠ THE `id < 0` GUARD IS THE POINT, not a filter that can be forgotten: bots live in
+        the reserved negative range (see `create_bot`), so this can never delete a real
+        player's save even if handed their id by a bug or a crafted request. Same shape as
+        `agents()`, for the same reason (contract §3)."""
+        with self.lock:
+            row = self.db.execute(
+                "SELECT state FROM players WHERE id=? AND id < 0 AND cohort=?", (pid, cohort)
+            ).fetchone()
+            if row is None:
+                return None
+            self.db.execute("DELETE FROM players WHERE id=? AND id < 0", (pid,))
+            self.db.commit()
+        return json.loads(row[0])
+
     def roster(self, cohort="default"):
         """Everyone in a cohort (humans + bots) — the admin/instructor view."""
         with self.lock:
@@ -220,6 +243,19 @@ def _self_check():
     bot = eng.create_bot({"n": 0})
     assert human > 0 and bot < 0, (human, bot)
     assert eng.agents() == [bot], eng.agents()
+
+    # ── retiring a bot returns its run, and CANNOT touch a human ──────────────
+    # An agent is retired when its TTL expires and its final state is the data
+    # the retirement exists to collect, so the two are one call. Both directions
+    # are asserted: a human id must be refused even when passed deliberately,
+    # because the negative-range guard is the only thing standing between a
+    # crafted admin request and somebody's save.
+    doomed = eng.create_bot({"n": 7})
+    assert eng.retire_bot(doomed) == {"n": 7}, "retiring must hand back the run"
+    assert doomed not in eng.agents(), "a retired bot is still on the live feed"
+    assert eng.retire_bot(doomed) is None, "retiring twice must be a no-op, not a crash"
+    assert eng.retire_bot(human) is None, "a HUMAN id was accepted by retire_bot"
+    assert eng.get(human) == (0, {"n": 0}), "retire_bot deleted a human player's save"
 
     # ── refusals are COUNTED even when the caller swallows them ───────────────
     # This is the whole point of the counter, so it is tested the way the callers
