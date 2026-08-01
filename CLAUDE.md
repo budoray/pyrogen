@@ -30,14 +30,22 @@ table for the live map before believing any number in a game document, including
 
 ⚠ **[[Titer]] and [[Corpus]] are GONE as of 2026-08-01** — absorbed into this game. Rows, cabinets,
 plates, vhosts, units and deploy-registry entries removed from the platform, and Dr. Ray deleted
-both A records and both GitHub repos. Their **local working copies remain** and are the reference
-this game was built from: the physiology came from Corpus and the selection from Titer.
-⚠ Those two directories are now the ONLY copies of that code. Nothing remote backs them up.
+both A records and both GitHub repos. ⚠⚠ **THE LOCAL WORKING COPIES ARE GONE TOO. CONFIRMED BY DR. RAY 2026-08-01: "gone gone, 100%
+deleted."** Repos deleted, A records removed, checkouts destroyed — **that code no longer exists in
+any form.** The physiology and selection Pyrogen was built from survive ONLY as they were rewritten
+into `pyrogen/physiology.py` and `pyrogen/selection.py`. **Those two files are now originals, not
+ports.** Treat them accordingly: there is nothing left to diff against, nothing to re-read when a
+constant looks wrong, and no way to recover an intention that did not make it into the rewrite.
+★ The warning here was correct, specific, written twice — and it still failed, because it recorded
+a *fact about the world* ("nothing remote backs them up") rather than an *action*. Nothing could
+catch the drift either: `app.py check` walks the repos in the **registry**, and a retired game is by
+definition out of every registry, so pulling the OPS rows also switched off the one process that
+might have noticed. **A document that says "this is the only copy" is a to-do item, not a note.**
 
-**Not playable yet, but no longer empty.** The engine core exists and gates: `pyrogen/catalog.py`,
-`pyrogen/selection.py`, `pyrogen/physiology.py`, `pyrogen/run.py` and `pyrogen/bench.py`. There is
-no server and no client — milestones 5 and 6 in the queue. What the repo still carries from the founding is
-`engine/`. The design record and the four founding questions are in
+**Playable and deployed, `v0.1.1-beta`.** Engine core — `pyrogen/catalog.py`, `selection.py`,
+`physiology.py`, `run.py`, `bench.py` — plus the server (`app.py`, the full contract) and the
+one-file client (`web/console.html`). All six founding milestones are done and the queue is empty.
+What the repo still carries from the founding is `engine/`. The design record and the four founding questions are in
 [`IMPROVEMENTS.md`](IMPROVEMENTS.md) — read it before writing a line of code.
 
 <!-- tenshin:platform:start -->
@@ -140,8 +148,12 @@ best play never changes between the two, this is Titer with a HUD and the merge 
 - **Not [[Nullroute]].** A pathogen is selection pressure, not an attacker with intent.
 - **No routing, no throughput, no conveyors.** Tissue is a field, not a network. (This boundary
   pointed at Clearance until that game was killed 2026-07-27; the boundary is the useful half.)
-- **Titer and Corpus are the PARENTS and this replaces them.** ⚠ Neither is deleted or redeployed
-  until this ships and Dr. Ray says so; until then all three exist and the two parents stay live.
+- **Titer and Corpus were the PARENTS and this replaced them.** ⚠ ~~Neither is deleted or redeployed
+  until this ships and Dr. Ray says so; until then all three exist and the two parents stay live.~~
+  **The condition was met and executed 2026-08-01** — both retired, both repos and A records deleted.
+  ⚠⚠ The stale half is the dangerous one: this line still read *"the two parents stay live"* in the
+  same file that records their deletion twelve lines above. **Their local working copies are the only
+  copies left, with nothing remote behind them.**
 
 ## The arcade rules — read the SSoT's *★ The arcade titles* before designing anything here
 - **2D ONLY. No isometric, ever.** ⚠ Not vector-glow either. Top-down, Factorio-style art direction.
@@ -171,13 +183,18 @@ player cannot touch the wave while it plays. That is the structural answer to th
 **can a fast player who does not know the immunology beat a slow player who does?** Here the fast
 player has nothing to be fast at.
 
-## The gate — the engine core, not yet the house one-liner
+## The gate — the house one-liner, plus the engine chain it did not replace
 ```bash
 python -m pyrogen.catalog && python -m pyrogen.selection && python -m pyrogen.physiology && python -m pyrogen.run && python -m pyrogen.bench --check
 ```
-⚠ **There is still no `app.py`**, so this is not yet the house `python app.py test`. It becomes that
-on the commit that creates the server (milestone 5); until then this chain is the honest whole gate
-and it is what `../Website/app.py`'s `OPS` row names.
+⚠ **`python app.py test` is now the house gate** — milestone 5 shipped and the OPS row says so.
+⚠⚠ **It JOINED the chain above, it did not replace it:** the engine modules still self-check, and
+the bench is still part of the gate. Run both.
+
+⚠ **This paragraph said "there is still no `app.py`" for a day after `app.py` shipped** — eight
+lines under a code fence that names it. ★ **A doc sentence about what does not exist yet has no
+check behind it and no expiry**; the only defence is to pin the claim to something verifiable (a
+version, a route, the OPS row) so the contradiction is visible rather than plausible.
 
 ⚠ **The bench is part of the gate**, as in Corpus — and it earns that here. It caught three separate
 errors that each printed a confident number, including a pathogen that was healing faster than it

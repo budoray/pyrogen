@@ -1,6 +1,7 @@
 # Pyrogen — design record + queue
 
-Slug `pyrogen` · port 9100 · **founded 2026-07-27 as `Febrile`, renamed 2026-08-01, not yet playable**.
+Slug `pyrogen` · port 9100 · **founded 2026-07-27 as `Febrile`, renamed and shipped 2026-08-01**
+(`v0.1.1-beta`, OPS `state: shipped`, Caddy vhost live, `tenshin-pyrogen:9100` on the box).
 Global standards live in the SSoT; this file is everything specific to this game.
 
 ## 2026-08-01 — the name, the port, and the two parents are all settled
@@ -29,11 +30,16 @@ was fixed. A name resolving to the box with no vhost does not fail fast; Caddy a
 its default host serves, and that is how Asymptote published a cabinet reading *sent an invalid
 response*.
 
-⚠⚠ **This puts Pyrogen in G8's shape, exactly as Febrile was:** the name resolves to the Droplet and
+⚠⚠ ~~**This puts Pyrogen in G8's shape, exactly as Febrile was:** the name resolves to the Droplet and
 there is no vhost, no unit and nothing bound to 9100. Correct and necessary — the record has to exist
 before the deploy can work — but **nothing about this game may be published or lit on the strength of
 it.** The OPS row is `registered`, the cabinet on the site is unlit *by construction*, and the plate
-says "In build" rather than describing a game that would have to be written to make it true.
+says "In build" rather than describing a game that would have to be written to make it true.~~
+**Closed the same day** — `deploy/Caddyfile` carries the `pyrogen.tenshinarts.com` block,
+`deploy/tenshin-pyrogen.service` binds 9100, and the OPS row reads `shipped`. G8's shape is a
+*window*, not a state, and it closed when the deploy landed. ⚠ **The paragraph outlived the window
+by a day** — which is exactly the G8 hazard running in reverse: a name resolving to nothing reads as
+fine, and a warning about a condition that has cleared reads as a live one.
 
 **Port 9100, and it is Corpus's.** Freed when [[Titer]] and [[Corpus]] were retired the same day.
 The rule on reissuing a port is that no name may still resolve in front of it — checked above, both
@@ -43,9 +49,25 @@ NXDOMAIN. This repo has now claimed three ports (9400 at founding, which was Con
 
 **The two parents are gone.** Corpus and Titer were retired into this game — rows, cabinets, plates,
 vhosts, units and deploy-registry entries removed, A records deleted, GitHub repos deleted.
-⚠ **Their local working copies are now the only copies of that code, with nothing remote behind
+⚠ ~~**Their local working copies are now the only copies of that code, with nothing remote behind
 them.** This game's physiology came from Corpus and its selection from Titer; those directories are
-the reference and should not be cleaned up casually.
+the reference and should not be cleaned up casually.~~
+
+⚠⚠ **AND THEN THE LOCAL COPIES WENT TOO. CONFIRMED BY DR. RAY 2026-08-01: "gone gone, 100%
+deleted."** Repos, A records and checkouts — all of it. **That code no longer exists in any form.**
+What survives is what was rewritten into `pyrogen/physiology.py` and `pyrogen/selection.py`, which
+makes those two files **originals rather than ports**: nothing to diff against, nothing to re-read
+when a constant looks wrong, no way to recover an intention that did not make it into the rewrite.
+
+★ **The lesson is about the shape of the warning, not the diligence of whoever wrote it.** The note
+above is *correct* and *specific* and it still failed, because it recorded a fact about the world
+("nothing backs these up") instead of an action ("push them somewhere first"). And nothing could
+catch the drift: `python app.py check` walks the repos in the **registry**, and a retired game is
+by definition out of every registry — so the moment the rows came out, the one process that could
+have noticed these directories disappearing stopped looking at them.
+**A document that says "this is the only copy" is a to-do item, not a note.**
+⚠ The search was thorough but not exhaustive. Other drives, deeper nesting, the recycle bin and any
+backup were not checked — **confirm before treating this as final.**
 
 ★ **The lesson from the `fabrile` typo stands and is why the table above exists:** that misspelling
 lived ONLY in DNS. Every repo, every registry and the OPS row spelled the name correctly the whole
@@ -100,9 +122,20 @@ printed a confident number:
   away, which is the ONE-death design intent, but nothing names the route yet.
 
 ## Where it stands
-Nothing is built. The four founding questions below are **open**, and the rule this platform keeps
-relearning applies to all of them: an answer here is not an answer until an assertion stands behind
-it. `python app.py test` does not exist yet and is the first milestone.
+
+**Shipped and playable, `v0.1.1-beta`.** Engine core, server, client and the full contract; the gate
+is the house `python app.py test`. Questions 1 and 2 are answered with a bench behind them (above);
+**3 and 4 are still open**, and the rule this platform keeps relearning applies to them: an answer
+here is not an answer until an assertion stands behind it.
+
+⚠⚠ **THIS SECTION SAID "Nothing is built" UNTIL 2026-08-01, THROUGH THE ENTIRE BUILD.** Every
+milestone landed, the game deployed, and the paragraph describing the repo never moved — while three
+other statements in these same two files still described the pre-deploy world (the header's *"not yet
+playable"*, the G8 note's *"no vhost, no unit and nothing bound to 9100"*, and CLAUDE.md's *"there is
+still no `app.py`"*, which sat eight lines above a gate command naming `app.py`). ★ **A status
+paragraph is the one kind of doc that is wrong by default**: it describes a moment, nothing
+recomputes it, and no gate can fail on it. **Statements of what EXISTS belong next to a way to check
+them — a version, a route, a registry row — never on their own.**
 
 ## The pitch
 Something is crossing your tissue and it learns. You have two ways to stop it: send cells to the
