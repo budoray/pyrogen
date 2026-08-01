@@ -63,14 +63,31 @@ ORGAN_PER_HEAD = run.ORGAN_PER_HEAD  # damage per living individual per beat, un
 # a player who has read the body does, and it is the only comparison that means
 # anything. `everything` stays pinned at 1.0 because it is the CONTROL that must
 # die — its job is to lose.
+# ⚠⚠ REWRITTEN 2026-08-01, AND THIS IS THE THIRD ROUND OF THE SAME MISTAKE.
+# Round one: both policies pinned at full drive, so both flatlined and selection
+# became drift. Round two: the oxygen stressor scaled with total hp, so everything
+# died at wave 1. Round three: these two backed off their DRIVE but still sat above
+# the response's oxygen cliff and still carried `glycogenolysis: 0.45`, so BOTH DIED
+# in every run — and nothing here asserted otherwise, because the only viability
+# assertions were on the two CONTROLS. Two answers that both die look identical, and
+# a comparison between them measures the harness.
+# ★ The rule this keeps re-teaching: the policies being COMPARED must be competent
+# play, and "competent" has to be checked, not asserted in a comment. `_self_check`
+# now requires every compared policy to finish alive.
+# ⚠ Levels are under the oxygen cliff: demand is 3.4 + 2.6*shiver against delivery
+# 4.90, so shiver breaks even at 0.507 and anything above it drowns the body.
+# ⚠ Both now FUND THEMSELVES from the store when blood sugar falls, rather than
+# carrying a flat `glycogenolysis: 0.45`. That flat draw was doing all the paying in
+# the old Q1 result — the two axes looked like they traded off, and what actually
+# traded off was a sugar release they happened to share.
 POLICIES = {
     "nothing":    lambda b: {},
-    # hold a fever short of the 41.5 ceiling rather than shivering into it
-    "systemic":   lambda b: {"shiver": 1.0 if b["temp"] < 39.6 else 0.0,
-                             "glycogenolysis": 0.45},
+    # hold a fever below the oxygen cliff, and pay for it when the sugar runs down
+    "systemic":   lambda b: {"shiver": 0.35 if b["temp"] < 38.6 else 0.0,
+                             "glycogenolysis": 0.4 if b["glucose"] < 4.6 else 0.0},
     # recruit until inflammation has eaten half the viability, then stop
-    "local":      lambda b: {"recruit": 1.0 if b["organ"] < 3.0 else 0.0,
-                             "glycogenolysis": 0.45},
+    "local":      lambda b: {"recruit": 0.45 if b["organ"] < 3.0 else 0.0,
+                             "glycogenolysis": 0.4 if b["glucose"] < 4.6 else 0.0},
     "everything": lambda b: {k: 1.0 for k in phys.RESPONSES},
 }
 
@@ -170,6 +187,19 @@ def _check():
     assert idle["organ"] > 0.5, \
         f"an unanswered wave cost the body only {idle['organ']} — it is not a threat"
 
+    # ⚠⚠ THE ASSERTION THIS BENCH NEVER HAD, and whose absence let three separate
+    # rounds of broken comparison certify an answer. `nothing` and `everything` are
+    # CONTROLS and their viability is asserted above; the two policies actually being
+    # COMPARED were never checked at all, and in round three both died in every run.
+    # Two answers that both flatline look identical, so the comparison measures the
+    # harness rather than the game. This is the check that catches the whole class.
+    for _name in ("systemic", "local"):
+        _r = resolve(wave, POLICIES[_name])
+        assert _r["alive"], (
+            f"the '{_name}' policy KILLED THE BODY ({_r['organ']} damage). A policy that "
+            "dies is not competent play, and comparing two of them measures nothing. "
+            "Fix the policy or the balance before reading any answer below.")
+
     a = resolve(wave, POLICIES["systemic"])
     b = resolve(wave, POLICIES["systemic"])
     assert a["survived"] == b["survived"] and a["spent"] == b["spent"], \
@@ -183,6 +213,24 @@ def _check():
     # ── question 1: does the better answer CHANGE with the wave? ──
     rows = q1_table()
     winners = {r["better"] for r in rows}
+    # ⚠⚠ THIS FIRES AS OF 2026-08-01 AND IT IS TELLING THE TRUTH. It was green only
+    # while both compared policies died (see the viability assertion above) and while
+    # both carried a flat `glycogenolysis: 0.45` that was doing all the paying — the
+    # two axes looked like they traded off, and what traded off was a shared sugar
+    # release. Make the policies competent and the systemic answer wins EVERY wave.
+    # ⚠ Verified across a sweep of both families before accepting it, because a weak
+    # `local` policy would be the same mistake again: recruit at 0.35/0.45/0.60/0.75
+    # with cutoffs 2.5–4.0 all leak survivors from wave 2 (3, 6, 7, 10, 13 …) at ~130
+    # substrate, against a fever that clears to zero for eight waves at ~20.
+    # ★ QUESTION 2 STILL HOLDS — fever collapses at wave 9–10 once heat resistance is
+    # bred, which is the crossover Q2 asks for. It is Q1 that fails: the LOCAL answer
+    # is dominated everywhere, not merely late. Recruitment's throughput is a pool
+    # spent front-to-back while a fever reaches every individual at once, so the two
+    # are not priced against each other at all.
+    # ⚠ DO NOT MAKE THIS GREEN BY WEAKENING IT. A kill switch that gets softened when
+    # it fires is the failure mode this whole file exists to prevent. The choice —
+    # reprice the local answer, or accept that the merge's premise needs restating —
+    # is Dr. Ray's, and it is written up in IMPROVEMENTS.md.
     assert winners == {"systemic", "local"}, (
         "THE MERGE FAILS QUESTION 1: the better answer was always "
         f"{winners.pop()} across {len(rows)} waves. One pool, two axes, and no "

@@ -188,6 +188,68 @@ does not teach is a bug.
 
 ---
 
+## ⚠⚠ THE Q1 KILL SWITCH HAS FIRED, and the gate is RED on purpose (2026-08-01)
+
+**Both of the two jobs are done, and doing them honestly turned the bench red.**
+
+**1 · Law 1 now binds the systemic axis.** `BURN_SHIVER` 0.26 → **0.45** and `REFILL`
+0.35 → **0.05**, both previously unnamed literals inside `step()`. Shivering burns blood
+glucose, glucose comes from glycogen via `glycogenolysis`, glycogen is finite — the loop
+the docstring always claimed. Measured:
+
+| | before | after |
+|---|---|---|
+| unfunded fever (shiver only) | 8 waves, **spent 0.0** | 2 waves — it degrades |
+| funded fever (releases sugar when low) | 8.8 waves, spent 0.2 | 8.8 waves, **spent 20.4** |
+| controls | idle survives, full drive dies | unchanged |
+
+`REFILL` at 0.35 returned **+10.5 per wave**, more than most policies drew: the store was
+paying for defences instead of being spent by them. 0.05 is a token trickle (1.5 a wave),
+incapable of funding anything on its own. ⚠ A hand-typed `0.35` in `physiology._self_check`
+went red when the constant moved, blaming recruitment — it reads `REFILL` now.
+
+**2 · The bench asserts what it never asserted:** every COMPARED policy must finish alive.
+`nothing` and `everything` are controls and always had viability checks; the two policies
+whose comparison IS the answer had none, and in the last round both died in every run.
+
+★ **And with competent policies, question 1 fails.** The kill switch fires with its own
+words: *the better answer was always systemic — this is Titer with a HUD. Stop here.*
+
+**Checked across a sweep of both families before accepting it**, because a weak `local`
+policy would be the same mistake a third time:
+
+| policy | survivors per wave | died at | cost |
+|---|---|---|---|
+| fever, shiver .35 < 38.6 | 0,0,0,0,0,0,0,0,0,**22** | wave 10 | ~20 |
+| recruit .45 < organ 3.0 | 0,**3,6,7,10,13** | wave 6 | ~130 |
+| recruit .35 / .60 / .75, cutoffs 2.5–4.0 | all leak from wave 2 | 5–6 | 120–150 |
+
+**The local answer is dominated everywhere, not merely late.** A fever reaches every
+individual at once; recruitment is a finite pool spent front-to-back. They are not priced
+against each other at all, so there is no wave at which the local answer is the better one.
+
+★ **QUESTION 2 STILL HOLDS.** Fever clears to zero for eight waves and collapses at 9–10
+once heat resistance is bred — that crossover is real and it is bred, not scripted. It is
+Q1 specifically that fails.
+
+⚠⚠ **THE GATE IS RED AND MUST STAY RED UNTIL THIS IS DECIDED.** Everything else passes
+(catalog, selection, physiology, run, game, `app.py test`); only `bench --check` fails, and
+it fails by design. **Do not make it green by weakening the assertion** — a kill switch
+that gets softened when it fires is the exact failure this file exists to prevent, and the
+old green was bought with two dying policies and a shared sugar release.
+
+**The decision is Dr. Ray's, and it is a real fork:**
+
+1. **Reprice the local answer** so recruitment can win somewhere — raise `RECRUIT_CLEARANCE`,
+   or make fever's reach fall off with the number of individuals so a big wave outruns it.
+   Keeps the merge's premise.
+2. **Accept that the premise needs restating.** If the systemic answer is simply the better
+   one and the local answer is a *cost-shaping* choice rather than a rival, then Q1 was the
+   wrong question and the game is still a game — but the design record should say so
+   instead of asserting a tradeoff that does not exist.
+
+⚠ The game is DEPLOYED and playable throughout this; none of it affects a player's session.
+
 ## ⚠ CORRECTION: a fever does NOT kill you. The systemic answer is FREE, and that is the real defect (2026-08-01)
 
 ★ **The entry that stood here was wrong and is deleted rather than amended, because it

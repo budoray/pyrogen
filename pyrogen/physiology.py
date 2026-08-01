@@ -48,6 +48,33 @@ RECRUIT_GLYCOGEN = 3.0      # substrate drawn per beat at full drive
 RECRUIT_CLEARANCE = 9.0     # hp of pathogen cleared per beat at full drive
 RECRUIT_INFLAMMATION = 0.22  # ⚠ the local answer damages the body too (autoimmunity)
 
+# ── what the responses BURN, and what the store gives back ────────────────────
+# ⚠ These four were unnamed literals inside `step()` until 2026-08-01, and the
+# balance of the whole game turns on them: they are why the systemic answer was
+# free. Named so they can be swept and so a change to one is visible in a diff.
+# ⚠⚠ 0.45, WAS 0.26 (2026-08-01). This number is LAW 1 for the systemic axis.
+# Shivering burns blood glucose; blood glucose comes from glycogen via
+# `glycogenolysis`; glycogen is the finite store. At 0.26 the burn was shallow
+# enough that the hepatic trickle covered it, so a fever never had to be funded and
+# reported `spent 0.0` — the docstring at the top of this file said "shivering is
+# paid for in glucose" and the arithmetic did not make it true.
+# Measured at 0.45: an UNFUNDED fever degrades over ~2 waves instead of running
+# free, while a funded one runs 8.8 and pays ~20 substrate. 0.50+ makes the naive
+# "just shiver" opening lethal on wave 1, which teaches by cliff rather than by cost.
+BURN_SHIVER = 0.45      # blood glucose per beat at full shiver
+BURN_TACHY = 0.14
+BURN_RECRUIT = 0.10
+# ⚠⚠ THE ONLY THING IN THIS MODULE THAT CREATES SUBSTRATE. A flat trickle into a
+# store the entire design calls finite, every beat, unconditional — over a 30-beat
+# wave it is +10.5, which is more than most policies draw. Law 1 says a defence is
+# paid for out of the store; this quietly pays for them instead.
+# ⚠⚠ 0.05, WAS 0.35 (2026-08-01). At 0.35 this returned +10.5 per 30-beat wave —
+# more than most policies drew, so the store paid for defences instead of being
+# spent by them, and "finite" was not true of the thing the whole design calls
+# finite. 0.05 is a token hepatic trickle (1.5 a wave): defensible physiology,
+# far below any policy's draw, and incapable of funding a defence on its own.
+REFILL = 0.05
+
 
 def new_body():
     return {
@@ -139,11 +166,11 @@ def step(b, drives, stressor):
     lost = (BASE_HEAT + 2.2 * g("vasodilate") + 0.9 * g("hyperventilate")) * b["periphery"] ** 0.35
     b["temp"] += (made - lost) * 0.09
 
-    burn = (0.26 * g("shiver") + 0.14 * g("tachycardia")
-            + 0.10 * g("recruit") + stressor.get("glu", 0.0))
+    burn = (BURN_SHIVER * g("shiver") + BURN_TACHY * g("tachycardia")
+            + BURN_RECRUIT * g("recruit") + stressor.get("glu", 0.0))
     b["glucose"] = max(0.1, b["glucose"] - burn + BASE_GLU * _hepatic(b))
     b["glucose"] -= BASE_GLU
-    b["glycogen"] = min(100.0, b["glycogen"] + 0.35)
+    b["glycogen"] = min(100.0, b["glycogen"] + REFILL)
 
     b["co2"] += 1.5 - 1.5 * _vent(b) - 1.6 * g("hyperventilate") + 0.5 * max(0.0, gap)
     b["co2"] = max(14.0, min(90.0, b["co2"]))
@@ -218,8 +245,13 @@ def _self_check():
     before = b["glycogen"]
     _ev, clear = step(b, {"recruit": 1.0}, {})
     drawn = before - b["glycogen"]
-    assert abs(drawn - (RECRUIT_GLYCOGEN - 0.35)) < 1e-6, \
-        f"recruitment drew {drawn}, not the {RECRUIT_GLYCOGEN} it was priced at"
+    # ⚠ `REFILL`, not a hand-typed 0.35. This assertion carried the refill as a
+    # LITERAL — a second copy of a constant defined forty lines up — so it went red
+    # the moment that constant moved, blaming recruitment for a number recruitment
+    # had nothing to do with. A check that restates its subject drifts with it.
+    assert abs(drawn - (RECRUIT_GLYCOGEN - REFILL)) < 1e-6, \
+        (f"recruitment drew {drawn}; expected {RECRUIT_GLYCOGEN} priced less the "
+         f"{REFILL} refill = {RECRUIT_GLYCOGEN - REFILL}")
     assert clear == RECRUIT_CLEARANCE, "a paid recruitment cleared nothing"
 
     # ...and it is REFUSED, not overdrawn, when the store cannot pay.
