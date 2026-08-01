@@ -188,52 +188,84 @@ does not teach is a bug.
 
 ---
 
-## ⚠⚠ BLOCKING: a fever kills the body on wave 1, every time (2026-08-01)
+## ⚠ CORRECTION: a fever does NOT kill you. The systemic answer is FREE, and that is the real defect (2026-08-01)
 
-**Measured, not suspected.** The saturation trap section below says to verify before
-shipping and record the table. This is the table, eight seeds, wave 1, via
-`game.play_wave`:
+★ **The entry that stood here was wrong and is deleted rather than amended, because it
+blocked a deploy.** It claimed "every schedule that raises a fever dies on wave 1 (0/8)"
+and called the signature mechanic fatal. **It was measured from three samples, all of
+them at `shiver` 0.7–1.0** — above a cost cliff — and generalised to every fever. Widening
+the sweep reverses it:
 
-| schedule | body alive | wave cleared |
+| `shiver` alone | body alive | wave cleared |
 |---|---|---|
-| nothing | 8/8 | 0/8 |
-| `recruit .45` | **8/8** | **8/8** |
-| `recruit .25` | 8/8 | 3/8 |
-| `hyperventilate .4` + `recruit .4` | **8/8** | **8/8** |
-| `glycogenolysis .1` alone | 8/8 | 0/8 |
-| `glycogenolysis .3` alone | **0/8** | 0/8 |
-| `recruit .45` + `glycogenolysis .3` | **0/8** | 8/8 |
-| fever trigger (`temp < 38.5 → shiver .7`) alone | **0/8** | 8/8 |
-| fever trigger + `recruit .45` | **0/8** | 8/8 |
-| fever trigger + `recruit .45` + `hyperventilate .4` | **0/8** | 8/8 |
+| 0.1 | 8/8 | 0/8 |
+| **0.2 – 0.4** | **8/8** | **8/8** |
+| 0.5 and up | 0/8 | 8/8 |
 
-★ **Two findings, and the second is the one that blocks a deploy.**
+**The cliff is arithmetic, not a bug.** `demand = BASE_DEMAND 3.4 + 2.6×shiver + o2 load`
+against `delivery 4.90`, so break-even is `(4.90 - 3.4 - 0.18) / 2.6 = 0.507` — the
+observed cliff to two decimals. Law 2 doing its job: spend past what delivery can carry
+and the body pays. `glycogenolysis` has its own cliff between 0.25 and 0.30.
 
-**1 · `glycogenolysis .3` is lethal on its own** — it kills the body while clearing
-nothing. Releasing sugar should be a cost, not a suicide; at `.1` it is survivable, so
-the lethal edge is somewhere between and it is very steep.
+**And the reflex is the best play, which is what Q3 wanted.** Campaigns to death, 8 seeds:
 
-**2 · EVERY schedule that raises a fever dies on wave 1** — in all three combinations
-tried, including with hyperventilation to fund the oxygen. They all *clear the wave*
-and the body is dead at the end of it. **The signature mechanic is currently fatal.**
+| schedule | median waves survived |
+|---|---|
+| **fever via trigger** (`temp < 38.6 → shiver .35`) | **8** |
+| flat `shiver .3` | 5 |
+| `recruit .45` | 4 |
+| mixed | 4 |
 
-⚠ **This contradicts the bench's answer to founding question 2**, which reports the
-fever run clearing waves 1–5. So either the bench's fever policy is expressible and I
-did not find it, or the two diverged — and `bench.py` and the player both go through
-`run.resolve`, so a divergence would be in the POLICY, not the loop. **That is the first
-thing to check, and it is cheap:** lift the bench's exact policy into a schedule and see
-whether it survives. If it does, the schedule vocabulary is missing something the bench
-can say. If it does not, question 2's answer needs re-reading.
+Writing a good threshold beats holding a good set-point. That is the game working.
 
-⚠ **Do NOT mark this game shipped until this resolves.** It runs, the loop is whole and
-you can play it — but a player who uses the mechanic the game is named after dies every
-time, and the OPS row saying `shipped` would be a claim that this is a game.
+---
 
-⚠ **The bots were moved to a recruit-only policy as a WORKAROUND** (`bot_schedule` in
-`app.py`, which says so at the call site). They survive 12/12 that way. A fleet on the
-honest policy would be two corpses in the live feed forever — which monitors as a
-living world and is not one. Give them their fever back when this is fixed; a living
-world whose agents cannot use the central verb demonstrates the wrong game.
+## ⚠⚠ THE ACTUAL DEFECT: the systemic answer never touches the shared store
+
+**Law 1 is the merge's entire justification** — *a defence is paid for out of the same
+finite store a set-point draws on.* It does not hold for fever, and `physiology.py`'s own
+docstring says it should: *"shivering is paid for in glucose."*
+
+Traced through `step()`:
+- `glycogenolysis` draws glycogen (`2.4 × drive`) — the store, correctly.
+- `recruit` draws glycogen (`RECRUIT_GLYCOGEN × drive`), and is refused rather than
+  overdrawn — the store, correctly.
+- `shiver` draws **blood glucose** (`0.26 × drive`), not the store — and glucose is topped
+  up each beat by `BASE_GLU × _hepatic(b)`.
+- ⚠ **`b["glycogen"] = min(100.0, b["glycogen"] + 0.35)` every beat, unconditionally.**
+  Over a 30-beat wave that is +10.5 of store created from nothing.
+
+So a pure-fever policy reports `spent 0.0`. Measured, viable policies, waves 1–9: the
+systemic answer wins **every** wave at **zero** substrate while the local answer pays 27.3
+falling to 4.45. **The better answer never flips.**
+
+⚠⚠ **WHICH MEANS FOUNDING QUESTION 1'S ANSWER RESTS ON A BOLT-ON.** Q1 reported the flip
+at wave 8, and both compared policies carried `glycogenolysis: 0.45`. That shared sugar
+release was doing all the paying — remove it and the flip vanishes. The one-pool result
+was measuring the funding both policies happened to share, not the two axes.
+
+★ **This is the design record's own recorded failure, third instance.** Round one: both
+policies pinned at full drive, so both flatlined and selection became drift. Round two:
+the oxygen stressor scaled with total hp. Round three is this — and the shape is identical
+every time: **the compared policies were not competent play, so the comparison measured
+the harness.** The bench asserts an idle wave survives and that full drive dies; it has
+never asserted that *the policies it compares keep the body alive*. Both of them die.
+
+**The fix is a design decision and it is Dr. Ray's**, because it changes what the game is:
+
+1. **Make shivering draw glycogen directly** — smallest change, and it is what the
+   docstring already claims. Law 1 becomes true for both axes by construction.
+2. **Deepen the glucose burn** so sustaining a fever forces `glycogenolysis`, which already
+   draws the store. Closer to real physiology, keeps the existing mechanic, and makes the
+   funding decision part of the fever rather than a separate slider.
+3. **Reconsider the +0.35/beat refill.** Whatever else changes, an unconditional trickle
+   into a store the whole design calls finite is the thing making "free" possible.
+
+⚠ **Then re-run Q1 and Q2 with policies that survive, and re-read both answers.** Do not
+assume they hold; they were measured on bodies that die.
+
+⚠ **The bench needs the assertion it has never had:** every compared policy must finish
+alive. That is the check that would have caught all three rounds of this.
 
 ## The saturation trap — verify before shipping, and record the table
 ★ The SSoT's generalised rule: **the pressure a game claims to teach must actually bind.** This

@@ -118,25 +118,24 @@ def bot_schedule(rng):
     everything loses, so a fleet of maximisers would flatline on wave one and the
     feed would show two corpses for ever. It backs off the body, which is what the
     bench's compared policies had to learn to do before question 1 meant anything."""
-    # ⚠⚠ RECRUIT-ONLY, AND THAT IS A SYMPTOM, NOT A STYLE CHOICE (2026-08-01).
-    # The first version of this shivered and released sugar like the bench's policies
-    # do. Measured over eight seeds at wave 1: `recruit .45` survives 8/8 and clears
-    # 8/8, while ANY schedule that raises a fever survives 0/8 — see the envelope
-    # table in IMPROVEMENTS.md. A fleet on the honest policy would be two corpses in
-    # the feed forever, which monitors as a living world and is not one.
-    # ⚠ So this is a WORKAROUND around an open balance finding, not the answer to it.
-    # When wave 1 stops being lethal to the signature mechanic, give the bots a fever
-    # back — a living world whose agents cannot use the game's central verb is a
-    # demonstration of the wrong game.
+    # ⚠ THE FEVER IS BACK, and the reason the earlier version of this said it could
+    # not be is recorded as a correction in IMPROVEMENTS.md: I measured fever only at
+    # shiver 0.7-1.0, above the oxygen cliff at 0.507, and concluded the mechanic was
+    # fatal. It is not. Below the cliff it is the STRONGEST play there is — a trigger
+    # at `temp < 38.6 -> shiver .35` survives a median of 8 waves against 4 for
+    # recruit-only, so agents on a recruit-only policy were demonstrating the weaker
+    # half of the game on the public feed.
+    # ⚠ Levels are deliberately kept under the cliff. An agent that flatlines on wave
+    # one is two corpses in the feed, which monitors as a living world and is not one.
     return {
-        "rest": {"recruit": round(rng.uniform(0.35, 0.55), 2),
-                 "hyperventilate": round(rng.uniform(0.2, 0.45), 2)},
+        "rest": {"recruit": round(rng.uniform(0.20, 0.35), 2)},
         "triggers": [
-            {"metric": "organ", "op": ">", "value": round(rng.uniform(2.0, 3.4), 1),
-             "set": {"recruit": 0.15}},
+            {"metric": "temp", "op": "<", "value": round(rng.uniform(38.4, 38.8), 1),
+             "set": {"shiver": round(rng.uniform(0.28, 0.40), 2)}},
+            {"metric": "organ", "op": ">", "value": round(rng.uniform(3.0, 4.0), 1),
+             "set": {"recruit": 0.0, "shiver": 0.0}},
         ],
     }
-
 
 def seed_bots():
     existing = ENG.agents()
