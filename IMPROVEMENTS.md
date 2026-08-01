@@ -150,7 +150,22 @@ their own boundaries until this ships. Do not go and edit Titer's law on the str
 
 ---
 
-## The four founding questions — OPEN
+## The four founding questions — 3 and 4 CLOSED, 1 REOPENED, 2 HOLDS
+
+⚠ **Culled and re-stated 2026-08-01.** This header said all four were OPEN long after two
+were answered and two were decided, which is the same defect as a queue outliving its work:
+a list that reads as outstanding when it is not.
+
+| # | state |
+|---|---|
+| 1 · one pool, two axes | ⚠ **REOPENED** — answered 2026-07-31, overturned 2026-08-01. The reported flip was carried by a `glycogenolysis: 0.45` both compared policies shared; with competent, surviving policies the systemic answer wins every wave and the kill switch fires. The bench is RED on this deliberately. |
+| 2 · fever disarms itself | ✅ **HOLDS** — re-measured after the retune: fever clears to zero for eight waves and collapses at 9–10 once heat resistance is bred. Bred, not scripted. |
+| 3 · where beats live | ✅ **CLOSED** — a set-point plus up to three triggers, committed before the wave. `pyrogen/game.py`. The platform's no-reaction-speed guard is structural: the schedule compiles to a pure function of the body before beat one and `resolve()` never yields. |
+| 4 · three losses or one | ✅ **CLOSED** — ONE, viability. Breach, autoimmunity and metabolic failure all land on the organ; `postmortem()` names the route and the set-point that ran away. |
+
+⚠ The four sections below are kept as the ORIGINAL questions, not rewritten to match their
+answers. The reasoning that produced a question is worth more than a tidy record of it — and
+question 1 being reopened is the argument: the answer moved, the question did not.
 
 ### 1 · What is the substrate, exactly, and does one pool really work?
 Corpus conserves oxygen, glucose, heat and pH against a budget per beat. Titer spent a placement
@@ -365,7 +380,12 @@ a single number on screen.
 tissue field, the inflammation bloom and the pathogen front are canvas. Sprites are for the things
 the player points at and chooses.
 
-**The honest answer today is: nothing yet, and this note has a known expiry.** Corpus's identical
+★ **The expiry arrived 2026-08-01 — this ask is now LIVE.** The gate below was *"no generation until
+the loop is proven"*, and the loop is proven and deployed (`v0.1.0-beta`, all six milestones,
+`tenshin-pyrogen:9100`). ⚠ **The condition lifted quietly**: nothing re-reads a note when the thing
+it waited on ships, so a deferral with a satisfied trigger looks identical to one still waiting.
+
+**The honest answer when this was written: nothing yet, and this note has a known expiry.** Corpus's identical
 note went stale within the hour because the game shipped the same evening — the *reasoning* held
 (art before the loop is decoration you then design around) and only the timing failed. So: no
 generation until the loop is proven, and then, in this order —
@@ -456,16 +476,16 @@ separate times — a correct observation with a wrong consequence attached — w
 rule here is to verify the consequence, not just the finding.
 
 ## Queue
-1. **Answer question 1 with a bench, before writing a client.** One pool, two axes, a table showing
-   the better answer changes by wave. If it does not, this game is Titer with a HUD and should be
-   stopped here — that is a cheap failure now and an expensive one after a client exists.
-2. `pyrogen/physiology.py` — ported from Corpus, conservation intact, extended so a recruitment
-   draws on the same store. Its self-check must fail if anything creates.
-3. `pyrogen/selection.py` — ported from Titer **unchanged in principle**, with the extra assertion
-   that it cannot see the drives, and the reversal assertion kept (a trait that stops paying must
-   fade, or what looked like selection was a difficulty curve wearing a hat).
-4. `pyrogen/catalog.py`, then the data files. No game logic until the data has a loader.
-5. `app.py` + the contract: `/version`, `/live`, `/live/embed`, `/live/stream`, `/live/agents`,
-   `/admin/players`, `/leaderboard.json`, in-process bots in a reserved id range, `python app.py
-   test`. ⚠ **A feed with no agents is a broken feature** and it monitors as healthy.
-6. The client, one file, both surfaces.
+
+Empty. ⚠ **Culled 2026-08-01 — all six founding milestones shipped.** Verified against the repo,
+not against memory of doing them: question 1 BENCHED but its answer since overturned (see the
+kill-switch entry above — the crossover it reported was carried by a sugar release both
+compared policies shared, and with competent policies the systemic answer wins every wave), `pyrogen/physiology.py`, `pyrogen/selection.py`, `pyrogen/catalog.py` + `data/`,
+`app.py` serving the full contract with `python app.py test` asserting `/version`, both `/live`
+surfaces, `/leaderboard.json` and a 403 on `/admin/players`, and `web/console.html` as the one-file
+client. The unit is on the box at `tenshin-pyrogen:9100`. `v0.1.0-beta`.
+
+⚠ **The queue outlived the work by a session** — milestones 5 and 6 were the two the model safeguard
+blocked (see the section below), and after they landed in a dedicated session nobody came back to
+strike the list. **A queue that survives its own completion is the same failure mode as a stale
+`SERVICES` list: it reads as work remaining, which reads exactly like fine.**
