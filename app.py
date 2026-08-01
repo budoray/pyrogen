@@ -58,6 +58,7 @@ ENG = TurnEngine(DB, comp_map=game.COMPETENCIES)
 RNG = random.Random()
 _SEEN = {}
 _LOCK = threading.RLock()
+_TURN = 0          # whose turn it is among the agents; see bot_tick
 
 BOT_NAMES = ["PYX", "FERV", "ILIA", "KALOR", "SEPSIS", "VIGIL", "ARDOR", "THERM"]
 
@@ -150,7 +151,17 @@ def bot_tick():
     agents = ENG.agents()
     if not agents:
         return None
-    pid = agents[int(time.time() / BOT_TICK) % len(agents)]
+    # ⚠ A COUNTER, NOT THE CLOCK. This was `int(time.time() / BOT_TICK) % len(agents)`,
+    # which reads as round-robin and is not: two calls inside one BOT_TICK window pick
+    # the SAME agent, so within any short window one bot takes every turn and the other
+    # starves. Live it eventually rotates, which is why it would never have been noticed
+    # — and it is untestable by construction, because a test cannot make the wall clock
+    # move. Found by asserting every agent's turn counter rose rather than that a tick
+    # returned something.
+    global _TURN
+    with _LOCK:
+        pid = agents[_TURN % len(agents)]
+        _TURN += 1
     try:
         state = ENG.get(pid)[1]
     except KeyError:
@@ -439,9 +450,20 @@ def _test():
 
     # ⚠ A feed with no agents is a broken feature that monitors as healthy.
     seed_bots()
-    assert ENG.agents(), "no agents were seeded"
-    moved = bot_tick()
-    assert moved is not None, "the bot ticker could not move any agent"
+    # ⚠ EXACTLY BOT_COUNT, not merely non-empty. The platform asks for two agents per
+    # game; "at least one" would pass with a single bot and the live feed would look
+    # thin for ever with nothing able to say so.
+    assert len(ENG.agents()) == BOT_COUNT,         f"{len(ENG.agents())} agents seeded, BOT_COUNT is {BOT_COUNT}"
+    # ⚠ AND THEY MUST ACTUALLY MOVE. A bot loop that swallows every exception makes an
+    # agent that can never legally act indistinguishable from one playing well — the
+    # engine counts refusals for exactly this reason, so assert on the counter rather
+    # than on the tick returning something.
+    before = {p: ENG.get(p)[0] for p in ENG.agents()}
+    for _ in range(BOT_COUNT * 2):
+        bot_tick()
+    after = {p: ENG.get(p)[0] for p in ENG.agents()}
+    assert all(after[p] > before[p] for p in before),         f"an agent never advanced a turn: {before} -> {after}"
+    assert not ENG.refused, f"the engine refused agent turns: {dict(ENG.refused)}"
     rows = _agent_rows()
     assert rows and all(r["id"] < 0 for r in rows), \
         "the agent feed showed something outside the reserved id range"
