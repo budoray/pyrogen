@@ -92,6 +92,42 @@ class TurnEngine:
             ).fetchall()
         return [r[0] for r in rows]
 
+    # ⚠ DORMANCY IS A COHORT, NOT A DELETE. Turning the population dial down must LOG AGENTS
+    # OUT, not destroy them: their saves are the world's history and the thing a load test
+    # wants back when the dial goes up again (Dr. Ray, 2026-08-01). `agents()` already filters
+    # by cohort, so a sleeping bot leaves the live feed and the stepping loop for free — no
+    # `active` column, no migration, and no second place that decides what "live" means.
+    DORMANT = "dormant"
+
+    def sleep_bot(self, pid, cohort="default"):
+        """Log one bot out: it keeps its save and leaves the live cohort. True if it moved."""
+        return self._move_bot(pid, cohort, self.DORMANT)
+
+    def wake_bot(self, cohort="default"):
+        """Bring the longest-sleeping bot back, or None if the pool is empty."""
+        with self.lock:
+            row = self.db.execute(
+                "SELECT id FROM players WHERE id < 0 AND cohort=? ORDER BY id DESC LIMIT 1",
+                (self.DORMANT,)).fetchone()
+        if row is None:
+            return None
+        return row[0] if self._move_bot(row[0], self.DORMANT, cohort) else None
+
+    def sleeping(self):
+        with self.lock:
+            return [r[0] for r in self.db.execute(
+                "SELECT id FROM players WHERE id < 0 AND cohort=? ORDER BY id DESC",
+                (self.DORMANT,))]
+
+    def _move_bot(self, pid, frm, to):
+        """⚠ `id < 0` again: a cohort move is a write, so it gets the same guard as every other
+        write in here. A human cannot be put to sleep by a dial."""
+        with self.lock:
+            cur = self.db.execute(
+                "UPDATE players SET cohort=? WHERE id=? AND id < 0 AND cohort=?", (to, pid, frm))
+            self.db.commit()
+        return cur.rowcount > 0
+
     def retire_bot(self, pid, cohort="default"):
         """Remove one bot and hand back its FINAL STATE, or None if it was not a bot.
 
@@ -250,6 +286,23 @@ def _self_check():
     # are asserted: a human id must be refused even when passed deliberately,
     # because the negative-range guard is the only thing standing between a
     # crafted admin request and somebody's save.
+    # ── the dial: asleep is not gone, and waking gets the SAME save back ──────
+    # Turning the population down logs agents out; turning it up brings them back. The save
+    # surviving the round trip is the whole point — a "dial" that quietly destroyed history
+    # would make every load test start from nothing and lose the run it was measuring.
+    napper = eng.create_bot({"n": 42})
+    assert eng.sleep_bot(napper) is True, "a live bot refused to sleep"
+    assert napper not in eng.agents(), "a sleeping bot is still on the live feed"
+    assert eng.sleeping() == [napper], eng.sleeping()
+    assert eng.get(napper) == (0, {"n": 42}), "sleeping destroyed the save"
+    assert eng.sleep_bot(napper) is False, "sleeping twice must report it did nothing"
+    assert eng.wake_bot() == napper, "waking did not return the sleeper"
+    assert napper in eng.agents() and eng.sleeping() == [], "wake left the cohorts wrong"
+    assert eng.get(napper) == (0, {"n": 42}), "the woken bot lost its save"
+    assert eng.wake_bot() is None, "waking an empty pool must be None, not a crash"
+    assert eng.sleep_bot(human) is False, "a HUMAN was put to sleep by the dial"
+    assert eng.retire_bot(napper) == {"n": 42}
+
     doomed = eng.create_bot({"n": 7})
     assert eng.retire_bot(doomed) == {"n": 7}, "retiring must hand back the run"
     assert doomed not in eng.agents(), "a retired bot is still on the live feed"
