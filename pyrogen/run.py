@@ -27,11 +27,11 @@ which is the same blindness the player has — they cannot read genomes either. 
 schedule the player committed and a bench policy are both just `(body) -> drives`,
 which is why one resolver serves both.
 
-    python -m febrile.run          # self-check
+    python -m pyrogen.run          # self-check
 """
 import sys
 
-from febrile import catalog, physiology as phys
+from pyrogen import catalog, physiology as phys
 
 BEATS = 30            # beats in one wave. Corpus's number, so the 39-damage
                       # arithmetic in the design record stays comparable.
@@ -139,7 +139,7 @@ def _frame(b, living, drives, dead=False):
 
 
 def _self_check():
-    from febrile import selection as sel
+    from pyrogen import selection as sel
     import random
 
     rng = random.Random(4)
@@ -169,7 +169,7 @@ def _self_check():
             "a frame carried the genomes the player is not allowed to read")
 
     fevered = sum(1 for f in loud["frames"] if f["temp"] >= 38.0)
-    print(f"febrile.run self-check OK -- an unanswered wave of {nothing['of']} lost none, "
+    print(f"pyrogen.run self-check OK -- an unanswered wave of {nothing['of']} lost none, "
           f"and a systemic answer to the same wave ran {len(loud['frames'])} beats "
           f"({fevered} of them febrile) for {loud['spent']} substrate, leaving "
           f"{loud['survived']} of {loud['of']} -- logged and unlogged agree on every "

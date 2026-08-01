@@ -13,7 +13,7 @@ teach nothing at all.
 """
 import sys
 
-from febrile import catalog
+from pyrogen import catalog
 
 # ⚠ Titer's ratio is 4.0 : 0.5, and the design record says that 8:1 is the number
 # to START from here, not to copy blindly — this environment is richer, so the
@@ -146,7 +146,7 @@ def _self_check():
     back = frequencies(pool).get("heat_shock", 0.0)
     assert back < 0.15, f"heat_shock never faded when it stopped paying ({back})"
 
-    print(f"febrile.selection self-check OK -- blind to the drives by source; "
+    print(f"pyrogen.selection self-check OK -- blind to the drives by source; "
           f"heat_shock rose to {got:.0%} of the pool over 12 waves of heat pressure "
           f"and fell back to {back:.0%} over 17 waves once carrying it stopped paying")
 

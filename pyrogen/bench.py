@@ -13,16 +13,16 @@ are asserted before any result is believed:
   · the two answers must face the IDENTICAL wave (or the table compares dice)
   · spending everything must lose to spending nothing (law 2, on both axes)
 
-    python -m febrile.bench            # the tables
-    python -m febrile.bench --check    # the gate: assert, print one line
+    python -m pyrogen.bench            # the tables
+    python -m pyrogen.bench --check    # the gate: assert, print one line
 """
 import random
 import sys
 
-from febrile import catalog, physiology as phys, selection as sel
-from febrile import run
+from pyrogen import catalog, physiology as phys, selection as sel
+from pyrogen import run
 
-# ⚠⚠ THE BEAT LOOP AND ITS CONSTANTS MOVED TO `febrile/run.py` (2026-07-31) AND ARE
+# ⚠⚠ THE BEAT LOOP AND ITS CONSTANTS MOVED TO `pyrogen/run.py` (2026-07-31) AND ARE
 # RE-EXPORTED HERE UNCHANGED. They were defined in this file when the bench was the
 # only thing that resolved a wave; the server resolves one too, and two copies of the
 # two-channel asymmetry is exactly the shape where a balance change moves one and not
@@ -76,7 +76,7 @@ POLICIES = {
 
 
 def resolve(wave, policy, seed=0):
-    """One wave, one policy — `febrile.run.resolve`, which the SERVER also calls.
+    """One wave, one policy — `pyrogen.run.resolve`, which the SERVER also calls.
 
     ⚠ The pathogen is damaged by two SEPARATE channels with different reach:
     fever touches every individual at once and is blunted per-genome by `heat`;
@@ -202,7 +202,7 @@ def _check():
         ("heat tolerance did not come from holding fevers — if the fever run and "
          "the no-fever run breed the same pool, the crossover is a difficulty ramp")
 
-    print(f"febrile.bench self-check OK -- controls held (an unanswered wave lost "
+    print(f"pyrogen.bench self-check OK -- controls held (an unanswered wave lost "
           f"0 of {idle['of']}, and full drive took {l2['everything']['organ']:.0f} "
           f"damage against {l2['nothing']['organ']:.0f} for doing nothing, and died); "
           f"question 1 ANSWERED: the better answer flips at wave {flip + 1} and both "

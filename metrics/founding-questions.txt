@@ -29,4 +29,4 @@ wave | fever left  organ | local left  organ
 final pools -- fever run: {'capsule': 0.3929, 'fast_split': 0.75, 'heat_shock': 0.5}
               local run: {'capsule': 0.0369, 'fast_split': 0.2212, 'heat_shock': 0.4424}
 
-febrile.bench self-check OK -- controls held (an unanswered wave lost 0 of 11, and full drive took 7 damage against 4 for doing nothing, and died); question 1 ANSWERED: the better answer flips at wave 8 and both win somewhere across 8 waves; question 2 ANSWERED: fever wins wave 1 and loses from wave 9, with heat-shock at 50% of the fever run's pool against 44% of the no-fever run's -- so the crossover was bred, not scripted
+pyrogen.bench self-check OK -- controls held (an unanswered wave lost 0 of 11, and full drive took 7 damage against 4 for doing nothing, and died); question 1 ANSWERED: the better answer flips at wave 8 and both win somewhere across 8 waves; question 2 ANSWERED: fever wins wave 1 and loses from wave 9, with heat-shock at 50% of the fever run's pool against 44% of the no-fever run's -- so the crossover was bred, not scripted

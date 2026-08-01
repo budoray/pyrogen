@@ -252,7 +252,7 @@ def _self_check():
     assert fever_over(b1) > 0.0 and fever_over(b2) > 0.0, \
         "fever is not readable from the body alone"
 
-    print(f"febrile.physiology self-check OK -- recruitment drew exactly "
+    print(f"pyrogen.physiology self-check OK -- recruitment drew exactly "
           f"{RECRUIT_GLYCOGEN} substrate from the one store and was REFUSED rather "
           f"than overdrawn at 1.0 left; a resting body took {rest['organ']:.0f} damage "
           f"over 30 beats where full drive on all {len(RESPONSES)} responses took "

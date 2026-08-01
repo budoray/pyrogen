@@ -1,17 +1,42 @@
-# Febrile — for Claude
+# Pyrogen — for Claude
 
-⚠ **`Febrile` is a THROWAWAY PROJECT NAME.** It is the merge of [[Titer]] and [[Corpus]] into one
-game, and the name is a placeholder for the mechanic it is built on (a fever is a defence that
-damages the defender). Dr. Ray renames it before it deploys; nothing below depends on the word.
-Slug `febrile`, port **9200**.
-⚠ **This said 9400 when the repo was founded, and 9400 is Continuous Yield's** — it holds a
-`registered` OPS row on that port. 9200 came free the same day when Asymptote was killed AND its
-A record removed; taking it is safe only because the DNS went first. Check `../Website/app.py`'s `OPS` table
-for the live port map before believing any number in a game document, including this one.
+**`Pyrogen` is the REAL NAME** (Dr. Ray, 2026-08-01), replacing the throwaway `Febrile` this repo
+was founded under. A pyrogen is the substance that *causes* a fever — literally "fire-maker" — and
+the **endogenous** ones are IL-1, IL-6 and TNF, which is what this engine actually models. So the
+name is the mechanic in the house way: *the thing that burns you is one you made.*
+Slug `pyrogen`, port **9100**.
 
-**Not playable yet, but no longer empty.** The engine core exists and gates: `febrile/catalog.py`,
-`febrile/selection.py`, `febrile/physiology.py` and `febrile/bench.py`. There is no server and no
-client — milestones 5 and 6 in the queue. What the repo still carries from the founding is
+⚠ **The rename was safe only because it landed BEFORE the first deploy.** slug == subdomain == unit
+== data directory == repo, so past a deploy this is a saves migration, not a string change. This was
+a `registered` row with no vhost, no unit and nothing bound — the cheapest possible moment.
+**Both halves outside this repo are DONE (Dr. Ray, 2026-08-01) and were verified, not assumed** —
+`github.com/budoray/pyrogen` exists, and a lookup against 8.8.8.8 reads `febrile.tenshinarts.com`
+→ NXDOMAIN with `pyrogen.tenshinarts.com` → 104.131.165.79. The old name was **removed**, not merely
+supplemented, which is the half that matters: a name resolving to the box with no vhost gets
+whatever Caddy's default host serves rather than failing clean, and that is exactly how Asymptote
+published a cabinet reading *sent an invalid response*.
+⚠⚠ **So this game is now in G8's shape: the name resolves and NOTHING is behind it.** Correct and
+necessary — the record must exist before a deploy can work — but **nothing about this game may be
+published or lit on the strength of it.** The OPS row stays `registered`, there is no Caddy vhost
+and no unit, and the cabinet on the site is unlit by construction. Deploying is what changes that.
+
+**PORT 9100 IS CLEAR.** It is Corpus's port, freed when Corpus and Titer — the two games this one
+is the merge of — were retired 2026-08-01. The condition on reissuing a port is that no name still
+resolves in front of it, and that was **checked rather than assumed**: `corpus.tenshinarts.com` and
+`titer.tenshinarts.com` both read NXDOMAIN against 8.8.8.8 the same day. Removing the A record is
+what frees a port; the undeploy is not. This repo said 9400 at founding (Continuous Yield's) and
+9200 after that (Doctrine of Signatures took it) — so check `../Website/app.py`'s `OPS`
+table for the live map before believing any number in a game document, including this one.
+
+⚠ **[[Titer]] and [[Corpus]] are GONE as of 2026-08-01** — absorbed into this game. Rows, cabinets,
+plates, vhosts, units and deploy-registry entries removed from the platform, and Dr. Ray deleted
+both A records and both GitHub repos. Their **local working copies remain** and are the reference
+this game was built from: the physiology came from Corpus and the selection from Titer.
+⚠ Those two directories are now the ONLY copies of that code. Nothing remote backs them up.
+
+**Not playable yet, but no longer empty.** The engine core exists and gates: `pyrogen/catalog.py`,
+`pyrogen/selection.py`, `pyrogen/physiology.py`, `pyrogen/run.py` and `pyrogen/bench.py`. There is
+no server and no client — milestones 5 and 6 in the queue. What the repo still carries from the founding is
 `engine/`. The design record and the four founding questions are in
 [`IMPROVEMENTS.md`](IMPROVEMENTS.md) — read it before writing a line of code.
 
@@ -148,7 +173,7 @@ player has nothing to be fast at.
 
 ## The gate — the engine core, not yet the house one-liner
 ```bash
-python -m febrile.catalog && python -m febrile.selection   && python -m febrile.physiology && python -m febrile.bench --check
+python -m pyrogen.catalog && python -m pyrogen.selection && python -m pyrogen.physiology && python -m pyrogen.run && python -m pyrogen.bench --check
 ```
 ⚠ **There is still no `app.py`**, so this is not yet the house `python app.py test`. It becomes that
 on the commit that creates the server (milestone 5); until then this chain is the honest whole gate
@@ -162,7 +187,7 @@ hurt. See the design record.
 - ⚠ **`TENSHIN_DEV` must be set BEFORE `import tenshin_gate`** — read into a module constant at import.
 - Tenshin drop-ins are copied **verbatim** — never fork them here. So is `engine/` (from Vested).
 - A pathogen, trait, defence, insult, set-point or reveal is **data**, never code
-  (`febrile/data/*.yaml`). Adding one must cost a data file.
+  (`pyrogen/data/*.yaml`). Adding one must cost a data file.
 - ⚠ **ONE loader owns the data**, and it is the only place assertions about what is IN the data
   live. Every assertion there must be breakable by editing a real data file — an
   `assert len(TRAITS) > 0` is worse than nothing, because it makes the gate look like it checks

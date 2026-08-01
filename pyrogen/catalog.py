@@ -51,7 +51,7 @@ def _self_check():
 
     assert stat([], "heat") == 1.0, "the unmarked baseline is not 1.0"
     assert stat(["heat_shock"], "heat") < 1.0, "heat_shock does not blunt fever"
-    print(f"febrile.catalog self-check OK -- {len(HERITABLE)} heritable traits, "
+    print(f"pyrogen.catalog self-check OK -- {len(HERITABLE)} heritable traits, "
           f"{len(heat_resistant)} blunting fever and {len(clear_resistant)} blunting "
           f"recruitment, none blunting both, and none of them able to appear before "
           f"wave {min(TRAITS[t].get('earliest', 1) for t in heat_resistant + clear_resistant)}")

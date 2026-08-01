@@ -1,41 +1,63 @@
-# Febrile — design record + queue
+# Pyrogen — design record + queue
 
-Slug `febrile` · port 9200 · **founded 2026-07-27, not yet playable**.
+Slug `pyrogen` · port 9100 · **founded 2026-07-27 as `Febrile`, renamed 2026-08-01, not yet playable**.
 Global standards live in the SSoT; this file is everything specific to this game.
 
-~~⚠⚠ **THE A RECORD IS MISSPELLED: `fabrile.tenshinarts.com` exists, `febrile` does
-not.**~~ — **FIXED 2026-07-30 by Dr. Ray, both halves.** Verified by lookup against
-8.8.8.8: `febrile.tenshinarts.com` → 104.131.165.79, and `fabrile` → NXDOMAIN, so the
-stray name was **deleted** and not merely supplemented. That second half was the one
-that mattered: a name resolving to the box with no vhost does not fail fast, Caddy
-answers with whatever its default host serves, and that is how Asymptote came to
-publish a cabinet reading *sent an invalid response*.
-⚠ **1.1.1.1 was still returning NXDOMAIN at the time of writing** — TTL is 3600, so
-expect up to an hour of disagreement between resolvers. A lookup that says "not found"
-during that window is not evidence the record is wrong.
+## 2026-08-01 — the name, the port, and the two parents are all settled
 
-★ **The lesson, and it is the reason this entry stays after the fix:** the typo lived
-ONLY in DNS. Every repo, every registry and the `OPS` row spelled `febrile` correctly
-the whole time, so no gate could see it and none ever will — `python app.py check`
-cannot read a zone file. It was found by looking at the DNS console, which is the one
-place on this platform nothing watches.
+**`Febrile` → `Pyrogen` (Dr. Ray).** Febrile was always a placeholder and said so in its own first
+line. A pyrogen is the substance that *causes* fever — literally "fire-maker" — and the endogenous
+ones are IL-1, IL-6 and TNF, which is what this engine models. The name is now the mechanic in the
+house way: *the thing that burns you is one you made.*
 
-⚠⚠ **This now puts Febrile in G8's shape, exactly like brainstem:** the name resolves
-to the Droplet and there is no vhost, no unit, and nothing bound to 9200. Correct and
-necessary — the record has to exist before the deploy can work — but **nothing about
-this game may be published or lit on the strength of it**, and the port rule still
-holds: 9200 was Asymptote's.
-⚠ **`Febrile` is a throwaway name** — a placeholder for the mechanic (a fever is a defence that
-damages the defender). Renaming it is a slug change; see the SSoT's deploy runbook before doing it,
-because slug == subdomain == unit == data directory == repo and a drift there deploys a game with no
-saves.
+⚠ **The rename was cheap only because it landed BEFORE the first deploy.** slug == subdomain ==
+unit == data directory == repo. This was a `registered` row with no vhost, no unit and nothing
+bound; past a deploy the same edit is a saves migration. **The window has now closed** — from the
+first deploy onward, renaming this game is a runbook, not a string change.
+
+**Verified, not assumed** (lookup against 8.8.8.8, 2026-08-01):
+
+| name | before | after |
+|---|---|---|
+| `febrile.tenshinarts.com` | 104.131.165.79 | **NXDOMAIN** |
+| `pyrogen.tenshinarts.com` | — | **104.131.165.79** |
+| `corpus.tenshinarts.com` | 104.131.165.79 | **NXDOMAIN** |
+| `titer.tenshinarts.com` | 104.131.165.79 | **NXDOMAIN** |
+
+The old name was **removed**, not merely supplemented — the same half that mattered when `fabrile`
+was fixed. A name resolving to the box with no vhost does not fail fast; Caddy answers with whatever
+its default host serves, and that is how Asymptote published a cabinet reading *sent an invalid
+response*.
+
+⚠⚠ **This puts Pyrogen in G8's shape, exactly as Febrile was:** the name resolves to the Droplet and
+there is no vhost, no unit and nothing bound to 9100. Correct and necessary — the record has to exist
+before the deploy can work — but **nothing about this game may be published or lit on the strength of
+it.** The OPS row is `registered`, the cabinet on the site is unlit *by construction*, and the plate
+says "In build" rather than describing a game that would have to be written to make it true.
+
+**Port 9100, and it is Corpus's.** Freed when [[Titer]] and [[Corpus]] were retired the same day.
+The rule on reissuing a port is that no name may still resolve in front of it — checked above, both
+NXDOMAIN. This repo has now claimed three ports (9400 at founding, which was Continuous Yield's;
+9200, which Doctrine of Signatures took; now 9100), which is the argument for the standing rule:
+**`../Website/app.py`'s `OPS` table is the live map, and a number in a game document is a claim.**
+
+**The two parents are gone.** Corpus and Titer were retired into this game — rows, cabinets, plates,
+vhosts, units and deploy-registry entries removed, A records deleted, GitHub repos deleted.
+⚠ **Their local working copies are now the only copies of that code, with nothing remote behind
+them.** This game's physiology came from Corpus and its selection from Titer; those directories are
+the reference and should not be cleaned up casually.
+
+★ **The lesson from the `fabrile` typo stands and is why the table above exists:** that misspelling
+lived ONLY in DNS. Every repo, every registry and the OPS row spelled the name correctly the whole
+time, so no gate could see it and none ever will — `python app.py check` cannot read a zone file.
+Every DNS claim in this file is therefore a recorded lookup, not a belief.
 
 ## 2026-07-31 — questions 1 and 2 ANSWERED, with a bench behind them
 
 Queue item 1 said: *answer question 1 with a bench, before writing a client. If the better answer
 never changes, this is Titer with a HUD and should be stopped here.* It does change. **The merge
 survives its own kill switch.** Tables in [`metrics/founding-questions.txt`](metrics/founding-questions.txt),
-regenerated by `python -m febrile.bench`.
+regenerated by `python -m pyrogen.bench`.
 
 **Question 1 — one pool, two axes: ANSWERED YES.** Against the *identical* wave, the systemic answer
 clears waves 1–3 outright for ~7 substrate while the local answer spends ~50 for a worse result — and
@@ -220,7 +242,7 @@ it unchanged.
 
 ## 2026-07-31 — the beat loop moved out of the bench, so there is ONE of it
 
-`febrile/run.py`. The thirty-beat loop and its five constants lived in `bench.py` because the
+`pyrogen/run.py`. The thirty-beat loop and its five constants lived in `bench.py` because the
 bench was the only thing that resolved a wave. Milestone 5 adds a second resolver — the server —
 and **two copies of the two-channel asymmetry is the shape where a balance change moves one and
 not the other, silently, with both still printing confident numbers.** The bench now calls the
@@ -232,7 +254,7 @@ belongs under the game. `bench.py` re-exports `BEATS`/`FEVER_KILL`/`LOAD_*`/`ORG
 unchanged so it reads as it did.
 
 **Proved two ways, because "nothing broke" and "they are the same code" are different claims:**
-- **Regression:** `python -m febrile.bench` is **byte-identical** to `metrics/founding-questions.txt`
+- **Regression:** `python -m pyrogen.bench` is **byte-identical** to `metrics/founding-questions.txt`
   (md5 `b0f3912…`) before and after. The founding answers did not move.
 - **Coupling:** halving `FEVER_KILL` *in `run.py`* moves the bench's question-1 crossover from
   **wave 8 to wave 5**. The bench genuinely reads the shared file; it is not a stale copy that
@@ -273,7 +295,7 @@ on this material, the likelier the block: the first two kills were fresh agents 
 no surrounding context, the third was a session saturated with it.
 
 ★ **What to do, in order:**
-1. **Work this repo in a SHORT, DEDICATED session.** Just Febrile, just the task. Not a long
+1. **Work this repo in a SHORT, DEDICATED session.** Just Pyrogen, just the task. Not a long
    platform thread that has been discussing it for an hour.
 2. Engine work belongs in the main session rather than a dispatched agent — a cold agent has the
    subject and none of the context that makes it legible.
@@ -296,12 +318,12 @@ rule here is to verify the consequence, not just the finding.
 1. **Answer question 1 with a bench, before writing a client.** One pool, two axes, a table showing
    the better answer changes by wave. If it does not, this game is Titer with a HUD and should be
    stopped here — that is a cheap failure now and an expensive one after a client exists.
-2. `febrile/physiology.py` — ported from Corpus, conservation intact, extended so a recruitment
+2. `pyrogen/physiology.py` — ported from Corpus, conservation intact, extended so a recruitment
    draws on the same store. Its self-check must fail if anything creates.
-3. `febrile/selection.py` — ported from Titer **unchanged in principle**, with the extra assertion
+3. `pyrogen/selection.py` — ported from Titer **unchanged in principle**, with the extra assertion
    that it cannot see the drives, and the reversal assertion kept (a trait that stops paying must
    fade, or what looked like selection was a difficulty curve wearing a hat).
-4. `febrile/catalog.py`, then the data files. No game logic until the data has a loader.
+4. `pyrogen/catalog.py`, then the data files. No game logic until the data has a loader.
 5. `app.py` + the contract: `/version`, `/live`, `/live/embed`, `/live/stream`, `/live/agents`,
    `/admin/players`, `/leaderboard.json`, in-process bots in a reserved id range, `python app.py
    test`. ⚠ **A feed with no agents is a broken feature** and it monitors as healthy.
